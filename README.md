@@ -1,6 +1,6 @@
 **Application**
 
-[qBittorrent](https://www.qbittorrent.org/)
+[qBittorrent](https://www.qbittorrent.org/)  
 [OpenVPN](https://openvpn.net/)  
 [Privoxy](http://www.privoxy.org/)
 
