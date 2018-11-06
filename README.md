@@ -1,21 +1,16 @@
 **Application**
 
-[rTorrent](https://github.com/rakshasa/rtorrent)  
-[ruTorrent](https://github.com/Novik/ruTorrent)  
-[autodl-irssi](https://github.com/autodl-community/autodl-irssi)  
-[Flood](https://github.com/jfurrow/flood)  
+[qBittorrent](https://www.qbittorrent.org/)
 [OpenVPN](https://openvpn.net/)  
 [Privoxy](http://www.privoxy.org/)
 
 **Description**
 
-rTorrent is a quick and efficient BitTorrent client that uses, and is in development alongside, the libTorrent (not to be confused with libtorrent-rasterbar) library. It is written in C++ and uses the ncurses programming library, which means it uses a text user interface. When combined with a terminal multiplexer (e.g. GNU Screen or Tmux) and Secure Shell, it becomes a convenient remote BitTorrent client. This Docker image includes the popular ruTorrent web frontend to rTorrent for ease of use, as well as OpenVPN to ensure a secure and private connection to the Internet, including use of iptables to prevent IP leakage when the tunnel is down. Privoxy is also included to allow unfiltered access to index sites, to use Privoxy please point your application at http://<host ip>:8118.
+qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other bittorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features. This Docker image is using the headless configuration with the web frontend enabled, as well as OpenVPN to ensure a secure and private connection to the Internet, including use of iptables to prevent IP leakage when the tunnel is down. Privoxy is also included to allow unfiltered access to index sites, to use Privoxy please point your application at http://<host ip>:8118.
 
 **Build notes**
 
-Latest stable rTorrent release from Arch Linux.
-Latest stable ruTorrent release from Arch Linux AUR.
-Latest GitHub commit to master branch for Flood.
+Latest Github Release of qBittorrent.
 Latest stable OpenVPN release from Arch Linux repo.
 Latest stable Privoxy release from Arch Linux repo.
 
@@ -23,10 +18,8 @@ Latest stable Privoxy release from Arch Linux repo.
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
-    -p 9080:9080 \
-    -p 9443:9443 \
+    -p 8080:8080 \
     -p 8118:8118 \
-    -p 3000:3000 \
     --name=<container name> \
     -v <path for data files>:/data \
     -v <path for config files>:/config \
@@ -38,8 +31,6 @@ docker run -d \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRICT_PORT_FORWARD=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
-    -e ENABLE_FLOOD=<yes|no|both> \
-    -e ENABLE_AUTODL_IRSSI=<yes|no> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
     -e DEBUG=<true|false> \
@@ -47,27 +38,17 @@ docker run -d \
     -e UMASK=<umask for created files> \
     -e PUID=<uid for user> \
     -e PGID=<gid for user> \
-    binhex/arch-rtorrentvpn
+    binhex/arch-qbittorrentvpn
 ```
 &nbsp;
 Please replace all user variables in the above command defined by <> with the correct values.
 
-**Access ruTorrent (web ui)**
+**Access qBittorrent (web ui)**
 
-`http://<host ip>:9080/`
-
-or
-
-`https://<host ip>:9443/`
+`http://<host ip>:8080/`
 
 Username:- admin
-Password:- rutorrent
-
-**Access Flood (web ui)**
-
-`http://<host ip>:3000/`
-
-Note:- Requires user to enable Flood via container env var (ENABLE_FLOOD).
+Password:- adminadmin
 
 **Access Privoxy**
 
@@ -77,11 +58,9 @@ Note:- Requires user to enable Flood via container env var (ENABLE_FLOOD).
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
-    -p 9080:9080 \
-    -p 9443:9443 \
+    -p 8080:8080 \
     -p 8118:8118 \
-    -p 3000:3000 \
-    --name=rtorrentvpn \
+    --name=qbittorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
     -v /etc/localtime:/etc/localtime:ro \
@@ -91,8 +70,6 @@ docker run -d \
     -e VPN_PROV=pia \
     -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
-    -e ENABLE_FLOOD=yes \
-    -e ENABLE_AUTODL_IRSSI=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,37.235.1.174,1.1.1.1,8.8.8.8,209.222.18.218,37.235.1.177,1.0.0.1,8.8.4.4 \
     -e DEBUG=false \
@@ -100,7 +77,7 @@ docker run -d \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
-    binhex/arch-rtorrentvpn
+    binhex/arch-qbittorrentvpn
 ```
 &nbsp;
 **AirVPN provider**
@@ -109,14 +86,14 @@ AirVPN users will need to generate a unique OpenVPN configuration file by using 
 
 1. Please select Linux and then choose the country you want to connect to
 2. Save the ovpn file to somewhere safe
-3. Start the rtorrentvpn docker to create the folder structure
-4. Stop rtorrentvpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
-5. Start rtorrentvpn docker
+3. Start the qbittorrentvpn docker to create the folder structure
+4. Stop qbittorrentvpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
+5. Start qbittorrentvpn docker
 6. Check supervisor.log to make sure you are connected to the tunnel
 
-AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the rTorrent configuration file located at /config/rtorrent/config/rtorrent.rc with the option `port_range = <start incoming port>-<end incoming port>` and `port_random = no`.
+AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the qBittorrent configuration file located at /config/qbittorrent/config/qbittorrent.conf.
 
-rTorrent example config
+qBittorrent example config
 ```
 port_range = 49400-49400
 port_random = no
@@ -126,19 +103,15 @@ port_random = no
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
-    -p 9080:9080 \
-    -p 9443:9443 \
+    -p 8080:8080 \
     -p 8118:8118 \
-    -p 3000:3000 \
-    --name=rtorrentvpn \
+    --name=qbittorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
     -v /etc/localtime:/etc/localtime:ro \
     -e VPN_ENABLED=yes \
     -e VPN_PROV=airvpn \
     -e ENABLE_PRIVOXY=yes \
-    -e ENABLE_FLOOD=yes \
-    -e ENABLE_AUTODL_IRSSI=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,37.235.1.174,8.8.8.8,209.222.18.218,37.235.1.177,8.8.4.4 \
     -e DEBUG=false \
@@ -146,7 +119,7 @@ docker run -d \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
-    binhex/arch-rtorrentvpn
+    binhex/arch-qbittorrentvpn
 ```
 &nbsp;
 **Notes**
@@ -164,16 +137,6 @@ If there are multiple ovpn files then please delete the ones you don't want to u
 User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
 
 `id <username>`
-
-If you want to create an additional user account for ruTorrent webui then please execute the following on the host:-
-
-`docker exec -it <container name> /home/nobody/createuser.sh <username to create>`
-
-If you want to delete a user account (or change the password for an account) then please execute the following on the host:-
-
-`docker exec -it <container name> /home/nobody/deluser.sh <username to delete>`
-
-If you do not define the PHP timezone you may see issues with the ruTorrent Scheduler plugin, please make sure you set the PHP timezone by specifying this using the environment variable PHP_TZ. Valid timezone values can be found here, http://php.net/manual/en/timezones.php
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 

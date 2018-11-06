@@ -28,8 +28,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 
 	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-        /usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent 
-        # webui is on port http://localhost:8080 username admin, password adminadmin
+		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent 
 
 		# run tmux attached to qBittorrent (daemonized, non-blocking), specifying listening interface and port
 		/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n qbittorrent /usr/bin/qbittorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
