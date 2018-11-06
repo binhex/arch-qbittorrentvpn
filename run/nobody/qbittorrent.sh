@@ -3,19 +3,19 @@
 # kill qbittorrent (required due to the fact qbittorrent cannot cope with dynamic changes to port)
 if [[ "${qbittorrent_running}" == "true" ]]; then
 
-    # note its not currently possible to change port and/or ip address whilst running, thus the sigterm
-    echo "[info] Sending SIGTERM (-15) to 'tmux: server' (will terminate qbittorrent) due to port/ip change..."
+	# note its not currently possible to change port and/or ip address whilst running, thus the sigterm
+	echo "[info] Sending SIGTERM (-15) to 'qbittorrent-nox' (will terminate qbittorrent) due to port/ip change..."
 
-    # SIGTERM used here as SIGINT does not kill the process
-    pkill -SIGTERM "tmux\: server"
+	# SIGTERM used here as SIGINT does not kill the process
+	pkill -SIGTERM "qbittorrent-nox"
 
-    # make sure 'qbittorrent main' process DOESNT exist before re-starting
-    while pgrep -x "qbittorrent main" &> /dev/null
-    do
+	# make sure 'qbittorrent-nox' process DOESNT exist before re-starting
+	while pgrep -x "qbittorrent-nox" &> /dev/null
+	do
 
-        sleep 0.5s
+		sleep 0.5s
 
-    done
+	done
 
 fi
 
@@ -28,18 +28,16 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 
 	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent 
-
-		# run tmux attached to qBittorrent (daemonized, non-blocking), specifying listening interface and port
-		/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n qbittorrent /usr/bin/qbittorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
+		# run qBittorrent (daemonized, non-blocking), specifying listening interface and port
+		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent
 
 		# set qbittorrent port to current vpn port (used when checking for changes on next run)
 		qbittorrent_port="${VPN_INCOMING_PORT}"
 
 	else
 
-		# run tmux attached to qBittorrent (daemonized, non-blocking), specifying listening interface
-		/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n qbittorrent /usr/bin/qbittorrent -b ${vpn_ip} -o ip=${external_ip}"
+		# run qBittorrent (daemonized, non-blocking), specifying listening interface
+		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent
 
 	fi
 
@@ -49,7 +47,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 else
 
 	# run tmux attached to qBittorrent (daemonized, non-blocking)
-	/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n qbittorrent /usr/bin/qbittorrent"
+	/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent
 
 fi
 
@@ -57,37 +55,37 @@ fi
 retry_count=30
 while true; do
 
-    if ! pgrep -x "qbittorrent main" > /dev/null; then
+	if ! pgrep -x "qbittorrent-nox" > /dev/null; then
 
-        retry_count=$((retry_count-1))
-        if [ "${retry_count}" -eq "0" ]; then
+		retry_count=$((retry_count-1))
+		if [ "${retry_count}" -eq "0" ]; then
 
-            echo "[warn] Wait for qBittorrent process to start aborted"
-            break
+			echo "[warn] Wait for qBittorrent process to start aborted"
+			break
 
-        else
+		else
 
-            if [[ "${DEBUG}" == "true" ]]; then
-                echo "[debug] Waiting for qBittorrent process to start..."
-            fi
+			if [[ "${DEBUG}" == "true" ]]; then
+				echo "[debug] Waiting for qBittorrent process to start..."
+			fi
 
-            sleep 1s
+			sleep 1s
 
-        fi
+		fi
 
-    else
+	else
 
-        echo "[info] qBittorrent process started"
-        break
+		echo "[info] qBittorrent process started"
+		break
 
-    fi
+	fi
 
 done
 
-echo "[info] Waiting for qBittorrent process to start listening on port 5000..."
+echo "[info] Waiting for qBittorrent process to start listening on port 8080..."
 
-while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
-    sleep 0.1
+while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".8080"') == "" ]]; do
+	sleep 0.1
 done
 
 echo "[info] qBittorrent process listening"
