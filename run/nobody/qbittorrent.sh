@@ -19,6 +19,9 @@ if [[ "${qbittorrent_running}" == "true" ]]; then
 
 fi
 
+echo "[info] Removing session lock file (if it exists)..."
+rm -f /config/qBittorrent/data/BT_backup/session.lock
+
 echo "[info] Attempting to start qBittorrent..."
 
 if [[ "${VPN_ENABLED}" == "yes" ]]; then

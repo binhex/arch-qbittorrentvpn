@@ -1,21 +1,24 @@
 #!/bin/bash
 
 # define destination file path for qbittorrent config file
-qbittorrent_config="/config/qbittorrent/config/qbittorrent.conf"
+qbittorrent_config="/config/qBittorrent/config/qbittorrent.conf"
 
 # if qbittorrent config file doesnt exist then copy default to host config volume
 if [[ ! -f "${qbittorrent_config}" ]]; then
 
-	echo "[info] qBittorrent config file doesnt exist, copying default to /config/qbittorrent/config/..."
+	echo "[info] qBittorrent config file doesnt exist, copying default to /config/qBittorrent/config/..."
 
-	# copy default qbittorrent config file to /config/qbittorrent/config/
-	mkdir -p /config/qbittorrent/config && cp /home/nobody/qbittorrent/config/* /config/qbittorrent/config/
+	# copy default qbittorrent config file to /config/qBittorrent/config/
+	mkdir -p /config/qBittorrent/config && cp /home/nobody/qbittorrent/config/* /config/qBittorrent/config/
 
 else
 
 	echo "[info] qBittorrent config file already exists, skipping copy"
 
 fi
+
+echo "[info] Removing session lock file (if it exists)..."
+rm -f /config/qBittorrent/data/BT_backup/session.lock
 
 # force unix line endings conversion in case user edited qbittorrent.conf with notepad
 dos2unix "${qbittorrent_config}"
