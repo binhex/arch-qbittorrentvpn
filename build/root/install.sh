@@ -3,6 +3,18 @@
 # exit script if return code != 0
 set -e
 
+# we cannot build from src currently due to this issue:- https://stackoverflow.com/questions/51027703/mxe-qt5-application-builds-fail-in-docker-container
+# we cannot use aur as this is not headless version and also doesnt build (see above).
+# we cannot use pacman as qbittorrent could be out of date (pointing at archive)
+# we cannot pull packages from aor as this may cause a package mismatch (due to point in time archive)
+
+# due to the above we are resetting to live repo and using pacman for this app.
+echo 'Server = http://mirror.bytemark.co.uk/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+echo 'Server = http://archlinux.mirrors.uk2.net/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
+
+# sync package databases for pacman
+pacman -Syyu --noconfirm
+
 # build scripts
 ####
 
@@ -19,7 +31,7 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /root/
 ####
 
 # define pacman packages
-pacman_packages="base-devel qt5-base qt5-tools qt5-svg boost boost-libs libtorrent-rasterbar python unrar geoip"
+pacman_packages="qbittorrent-nox python unrar geoip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -43,12 +55,6 @@ aur_packages=""
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
-
-# github releases
-####
-
-# download qbittorrent source
-/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/opt/qbittorrent" -go "qbittorrent" -gr "qBittorrent" -rt "source" -qt "tags" -cs "cd /opt/qbittorrent && ./configure --disable-gui && make && make install && rm -rf /opt/qbittorrent"
 
 # container perms
 ####

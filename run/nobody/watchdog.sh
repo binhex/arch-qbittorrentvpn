@@ -51,7 +51,7 @@ while true; do
 			fi
 
 			# check if qbittorrent is running, if not then skip shutdown of process
-			if ! pgrep -x "qbittorrent main" > /dev/null; then
+			if ! pgrep -x "qbittorrent-nox" > /dev/null; then
 
 				echo "[info] qBittorrent not running"
 
@@ -128,7 +128,7 @@ while true; do
 	else
 
 		# check if qbittorrent is running, if not then start via qbittorrent.sh
-		if ! pgrep -x "qbittorrent main" > /dev/null; then
+		if ! pgrep -x "qbittorrent-nox" > /dev/null; then
 
 			echo "[info] qBittorrent not running"
 

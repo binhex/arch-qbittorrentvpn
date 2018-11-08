@@ -19,9 +19,6 @@ if [[ "${qbittorrent_running}" == "true" ]]; then
 
 fi
 
-echo "[info] Removing any qBittorrent session lock files left over from the previous run..."
-rm -f /config/qbittorrent/session/*.lock
-
 echo "[info] Attempting to start qBittorrent..."
 
 if [[ "${VPN_ENABLED}" == "yes" ]]; then
@@ -29,7 +26,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
 		# run qBittorrent (daemonized, non-blocking), specifying listening interface and port
-		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent
+		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config --relative-fastresume
 
 		# set qbittorrent port to current vpn port (used when checking for changes on next run)
 		qbittorrent_port="${VPN_INCOMING_PORT}"
@@ -37,7 +34,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 	else
 
 		# run qBittorrent (daemonized, non-blocking), specifying listening interface
-		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent
+		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config --relative-fastresume
 
 	fi
 
@@ -47,7 +44,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 else
 
 	# run tmux attached to qBittorrent (daemonized, non-blocking)
-	/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config/qbittorrent
+	/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config --relative-fastresume
 
 fi
 
