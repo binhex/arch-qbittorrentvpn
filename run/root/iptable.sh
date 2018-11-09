@@ -42,8 +42,8 @@ if [[ $iptable_mangle_exit_code == 0 ]]; then
 
 	echo "[info] iptable_mangle support detected, adding fwmark for tables"
 
-	# setup route for qbittorrent http using set-mark to route traffic for port 8080 to eth0
-	echo "8080    qbittorrent_http" >> /etc/iproute2/rt_tables
+	# setup route for qbittorrent http using set-mark to route traffic for port WEBUI_PORT to eth0
+	echo "${WEBUI_PORT}    qbittorrent_http" >> /etc/iproute2/rt_tables
 	ip rule add fwmark 1 table qbittorrent_http
 	ip route add default via $DEFAULT_GATEWAY table qbittorrent_http
 
@@ -89,9 +89,9 @@ iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACC
 # accept input to vpn gateway
 iptables -A INPUT -i eth0 -p $VPN_PROTOCOL --sport $VPN_PORT -j ACCEPT
 
-# accept input to qbittorrent port 8080
-iptables -A INPUT -i eth0 -p tcp --dport 8080 -j ACCEPT
-iptables -A INPUT -i eth0 -p tcp --sport 8080 -j ACCEPT
+# accept input to qbittorrent port WEBUI_PORT
+iptables -A INPUT -i eth0 -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -100,7 +100,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 
 	# accept input to qbittorrent api - used for lan access
-	iptables -A INPUT -i eth0 -s "${lan_network_item}" -p tcp --dport 8080 -j ACCEPT
+	iptables -A INPUT -i eth0 -s "${lan_network_item}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
 
 	# accept input to privoxy if enabled
 	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
@@ -136,15 +136,15 @@ iptables -A OUTPUT -o eth0 -p $VPN_PROTOCOL --dport $VPN_PORT -j ACCEPT
 # if iptable mangle is available (kernel module) then use mark
 if [[ $iptable_mangle_exit_code == 0 ]]; then
 
-	# accept output from qbittorrent port 8080 - used for external access
-	iptables -t mangle -A OUTPUT -p tcp --dport 8080 -j MARK --set-mark 1
-	iptables -t mangle -A OUTPUT -p tcp --sport 8080 -j MARK --set-mark 1
+	# accept output from qbittorrent port WEBUI_PORT - used for external access
+	iptables -t mangle -A OUTPUT -p tcp --dport "${WEBUI_PORT}" -j MARK --set-mark 1
+	iptables -t mangle -A OUTPUT -p tcp --sport "${WEBUI_PORT}" -j MARK --set-mark 1
 
 fi
 
-# accept output from qbittorrent port 8080 - used for lan access
-iptables -A OUTPUT -o eth0 -p tcp --dport 8080 -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp --sport 8080 -j ACCEPT
+# accept output from qbittorrent port WEBUI_PORT - used for lan access
+iptables -A OUTPUT -o eth0 -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -153,7 +153,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 
 	# accept output to qbittorrent api - used for lan access
-	iptables -A OUTPUT -o eth0 -d "${lan_network_item}" -p tcp --sport 8080 -j ACCEPT
+	iptables -A OUTPUT -o eth0 -d "${lan_network_item}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 	# accept output from privoxy if enabled - used for lan access
 	if [[ $ENABLE_PRIVOXY == "yes" ]]; then

@@ -10,7 +10,7 @@ qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (
 
 **Build notes**
 
-Latest Github Release of qBittorrent.
+Latest stable qBittorrent release from Arch Linux repo.
 Latest stable OpenVPN release from Arch Linux repo.
 Latest stable Privoxy release from Arch Linux repo.
 
@@ -34,7 +34,7 @@ docker run -d \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
     -e DEBUG=<true|false> \
-    -e PHP_TZ=<php timezone> \
+    -e WEBUI_PORT=<port for web interfance> \
     -e UMASK=<umask for created files> \
     -e PUID=<uid for user> \
     -e PGID=<gid for user> \
@@ -73,7 +73,7 @@ docker run -d \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,37.235.1.174,1.1.1.1,8.8.8.8,209.222.18.218,37.235.1.177,1.0.0.1,8.8.4.4 \
     -e DEBUG=false \
-    -e PHP_TZ=UTC \
+    -e WEBUI_PORT=8080 \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
@@ -115,7 +115,7 @@ docker run -d \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,37.235.1.174,8.8.8.8,209.222.18.218,37.235.1.177,8.8.4.4 \
     -e DEBUG=false \
-    -e PHP_TZ=UTC \
+    -e WEBUI_PORT=8080 \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
@@ -137,6 +137,10 @@ If there are multiple ovpn files then please delete the ones you don't want to u
 User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
 
 `id <username>`
+
+Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
+
+For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 

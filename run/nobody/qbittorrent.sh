@@ -29,7 +29,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
 		# run qBittorrent (daemonized, non-blocking), specifying listening interface and port
-		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config --relative-fastresume
+		/usr/bin/qbittorrent-nox --daemon --webui-port="${WEBUI_PORT}" --profile=/config --relative-fastresume
 
 		# set qbittorrent port to current vpn port (used when checking for changes on next run)
 		qbittorrent_port="${VPN_INCOMING_PORT}"
@@ -37,7 +37,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 	else
 
 		# run qBittorrent (daemonized, non-blocking), specifying listening interface
-		/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config --relative-fastresume
+		/usr/bin/qbittorrent-nox --daemon --webui-port="${WEBUI_PORT}" --profile=/config --relative-fastresume
 
 	fi
 
@@ -47,7 +47,7 @@ if [[ "${VPN_ENABLED}" == "yes" ]]; then
 else
 
 	# run tmux attached to qBittorrent (daemonized, non-blocking)
-	/usr/bin/qbittorrent-nox --daemon --webui-port=8080 --profile=/config --relative-fastresume
+	/usr/bin/qbittorrent-nox --daemon --webui-port="${WEBUI_PORT}" --profile=/config --relative-fastresume
 
 fi
 
@@ -82,9 +82,9 @@ while true; do
 
 done
 
-echo "[info] Waiting for qBittorrent process to start listening on port 8080..."
+echo "[info] Waiting for qBittorrent process to start listening on port ${WEBUI_PORT}..."
 
-while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".8080"') == "" ]]; do
+while [[ $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".${WEBUI_PORT}\"") == "" ]]; do
 	sleep 0.1
 done
 

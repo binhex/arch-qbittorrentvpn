@@ -300,6 +300,14 @@ elif [[ $VPN_ENABLED == "no" ]]; then
 	echo "[warn] !!IMPORTANT!! You have set the VPN to disabled, you will NOT be secure!" | ts '%Y-%m-%d %H:%M:%.S'
 fi
 
+export WEBUI_PORT=$(echo "${WEBUI_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${WEBUI_PORT}" ]]; then
+	echo "[info] WEBUI_PORT defined as '${WEBUI_PORT}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] WEBUI_PORT not defined (via -e WEBUI_PORT), defaulting to '8080'" | ts '%Y-%m-%d %H:%M:%.S'
+	export WEBUI_PORT="8080"
+fi
+
 EOF
 
 # replace env vars placeholder string with contents of file (here doc)
