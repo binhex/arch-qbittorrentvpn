@@ -18,6 +18,8 @@ Latest stable Privoxy release from Arch Linux repo.
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
+    -p 6881:6881 \
+    -p 6881:6881/udp \
     -p 8080:8080 \
     -p 8118:8118 \
     --name=<container name> \
@@ -58,6 +60,8 @@ Password:- adminadmin
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
+    -p 6881:6881 \
+    -p 6881:6881/udp \
     -p 8080:8080 \
     -p 8118:8118 \
     --name=qbittorrentvpn \
@@ -103,6 +107,8 @@ port_random = no
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
+    -p 6881:6881 \
+    -p 6881:6881/udp \
     -p 8080:8080 \
     -p 8118:8118 \
     --name=qbittorrentvpn \

@@ -24,7 +24,7 @@ rm -f /config/qBittorrent/data/BT_backup/session.lock
 dos2unix "${qbittorrent_config}"
 
 # set default values for port and ip
-qbittorrent_port="49160"
+qbittorrent_port="6881"
 qbittorrent_ip="0.0.0.0"
 
 # while loop to check ip and port

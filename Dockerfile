@@ -35,14 +35,14 @@ VOLUME /config
 # map /data to host defined data path (used to store data from app)
 VOLUME /data
 
+# expose port for incoming connections (used only if vpn disabled)
+EXPOSE 6881
+
 # expose port for qbittorrent http
 EXPOSE 8080
 
 # expose port for privoxy
 EXPOSE 8118
-
-# expose port for incoming connections (used only if vpn disabled)
-EXPOSE 49160
 
 # set permissions
 #################
