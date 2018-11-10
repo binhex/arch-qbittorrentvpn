@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # define destination file path for qbittorrent config file
-qbittorrent_config="/config/qBittorrent/config/qbittorrent.conf"
+qbittorrent_config="/config/qBittorrent/config/qBittorrent.conf"
 
 # if qbittorrent config file doesnt exist then copy default to host config volume
 if [[ ! -f "${qbittorrent_config}" ]]; then
@@ -36,6 +36,12 @@ while true; do
 	port_change="false"
 
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
+
+		# forcibly set allow anonymous access from localhost to api (used to change incoming port)
+		sed -i "s~^WebUI\LocalHostAuth=.*~WebUI\LocalHostAuth=true~g" "${qbittorrent_config}"
+
+		# forcibly set random incoming port to false
+		sed -i "s~^General\UseRandomPort=.*~General\UseRandomPort=false~g" "${qbittorrent_config}"
 
 		# run script to check ip is valid for tunnel device (will block until valid)
 		source /home/nobody/getvpnip.sh

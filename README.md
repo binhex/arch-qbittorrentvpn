@@ -17,7 +17,7 @@ Latest stable Privoxy release from Arch Linux repo.
 **Usage**
 ```
 docker run -d \
-    --cap-add=NET_ADMIN \
+    --privileged=true \
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8080:8080 \
@@ -59,7 +59,7 @@ Password:- adminadmin
 **PIA example**
 ```
 docker run -d \
-    --cap-add=NET_ADMIN \
+    --privileged=true \
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8080:8080 \
@@ -106,7 +106,7 @@ port_random = no
 **AirVPN example**
 ```
 docker run -d \
-    --cap-add=NET_ADMIN \
+    --privileged=true \
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8080:8080 \
