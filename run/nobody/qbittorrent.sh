@@ -6,7 +6,7 @@ if [[ "${qbittorrent_running}" == "true" ]]; then
 
 	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-		curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences"
+		curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
 
 	fi
 
@@ -61,7 +61,7 @@ else
 	# option 'Bypass authentication for clients on localhost'
 	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-		curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences"
+		curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
 
 	fi
 

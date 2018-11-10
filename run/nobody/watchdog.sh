@@ -38,7 +38,7 @@ while true; do
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
 
 		# forcibly set allow anonymous access from localhost to api (used to change incoming port)
-		sed -i "s~^WebUI\LocalHostAuth=.*~WebUI\LocalHostAuth=true~g" "${qbittorrent_config}"
+		sed -i "s~^WebUI\LocalHostAuth=.*~WebUI\LocalHostAuth=false~g" "${qbittorrent_config}"
 
 		# forcibly set random incoming port to false
 		sed -i "s~^General\UseRandomPort=.*~General\UseRandomPort=false~g" "${qbittorrent_config}"
