@@ -95,7 +95,7 @@ while true; do
 					if [[ "${qbittorrent_running}" == "true" ]]; then
 
 						# run netcat to identify if port still open, use exit code
-						nc_exitcode=$(/usr/bin/nc -z -w 3 "${qbittorrent_ip}" "${qbittorrent_port}")
+						nc_exitcode=$(/usr/bin/nc -z -w 3 "${vpn_ip}" "${qbittorrent_port}")
 
 						if [[ "${nc_exitcode}" -ne 0 ]]; then
 
