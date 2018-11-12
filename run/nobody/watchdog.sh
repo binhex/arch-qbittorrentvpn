@@ -49,7 +49,7 @@ while true; do
 			# if current bind interface ip is different to tunnel local ip then re-configure qbittorrent
 			if [[ "${qbittorrent_ip}" != "${vpn_ip}" ]]; then
 
-				echo "[info] qBittorrent listening interface IP $qbittorrent_ip and VPN provider IP ${vpn_ip} different, marking for reconfigure"
+				echo "[info] qBittorrent listening interface IP ${qbittorrent_ip} and VPN provider IP ${vpn_ip} different, marking for reconfigure"
 
 				# mark as reload required due to mismatch
 				ip_change="true"
