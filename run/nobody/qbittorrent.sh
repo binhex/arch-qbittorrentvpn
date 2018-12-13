@@ -1,21 +1,6 @@
 #!/bin/bash
 
-# change incoming port using the qbittorrent api - note this requires anonymous authentication via webui
-# option 'Bypass authentication for clients on localhost'
-if [[ "${qbittorrent_running}" == "true" ]]; then
-
-	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
-
-		curl -i -X POST -d "json=%7B%22random_port%22%3Afalse%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
-		curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
-		
-		# set qbittorrent port to current vpn port (used when checking for changes on next run)
-		qbittorrent_port="${VPN_INCOMING_PORT}"
-
-
-	fi
-
-else
+if [[ "${qbittorrent_running}" == "false" ]]; then
 
 	echo "[info] Removing session lock file (if it exists)..."
 	rm -f /config/qBittorrent/data/BT_backup/session.lock
@@ -62,17 +47,17 @@ else
 		sleep 0.1
 	done
 
-	# change incoming port using the qbittorrent api - note this requires anonymous authentication via webui
-	# option 'Bypass authentication for clients on localhost'
-	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
+fi
 
-		curl -i -X POST -d "json=%7B%22random_port%22%3Afalse%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
-		curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
+# change incoming port using the qbittorrent api - note this requires anonymous authentication via webui
+# option 'Bypass authentication for clients on localhost'
+if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-		# set rtorrent port to current vpn port (used when checking for changes on next run)
-		qbittorrent_port="${VPN_INCOMING_PORT}"
+	curl -i -X POST -d "json=%7B%22random_port%22%3Afalse%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
+	curl -i -X POST -d "json=%7B%22listen_port%22%3A${VPN_INCOMING_PORT}%7D" "http://localhost:${WEBUI_PORT}/command/setPreferences" &> /dev/null
 
-	fi
+	# set rtorrent port to current vpn port (used when checking for changes on next run)
+	qbittorrent_port="${VPN_INCOMING_PORT}"
 
 fi
 
