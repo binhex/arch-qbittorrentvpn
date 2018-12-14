@@ -5,51 +5,7 @@ if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
 	export VPN_PROTOCOL="tcp"
 fi
 
-# ip route
-###
-
-# split comma seperated string into list from LAN_NETWORK env variable
-IFS=',' read -ra lan_network_list <<< "${LAN_NETWORK}"
-
-# process lan networks in the list
-for lan_network_item in "${lan_network_list[@]}"; do
-
-	# strip whitespace from start and end of lan_network_item
-	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-
-	echo "[info] Adding ${lan_network_item} as route via docker eth0"
-	ip route add "${lan_network_item}" via "${DEFAULT_GATEWAY}" dev eth0
-
-done
-
-echo "[info] ip route defined as follows..."
-echo "--------------------"
-ip route
-echo "--------------------"
-
-# setup iptables marks to allow routing of defined ports via eth0
-###
-
-if [[ "${DEBUG}" == "true" ]]; then
-	echo "[debug] Modules currently loaded for kernel" ; lsmod
-fi
-
-# check we have iptable_mangle, if so setup fwmark
-lsmod | grep iptable_mangle
-iptable_mangle_exit_code=$?
-
-if [[ $iptable_mangle_exit_code == 0 ]]; then
-
-	echo "[info] iptable_mangle support detected, adding fwmark for tables"
-
-	# setup route for qbittorrent http using set-mark to route traffic for port WEBUI_PORT to eth0
-	echo "${WEBUI_PORT}    qbittorrent_http" >> /etc/iproute2/rt_tables
-	ip rule add fwmark 1 table qbittorrent_http
-	ip route add default via $DEFAULT_GATEWAY table qbittorrent_http
-
-fi
-
-# identify docker bridge interface name (probably eth0)
+# identify docker bridge interface name (probably "${docker_interface}")
 docker_interface=$(netstat -ie | grep -vE "lo|tun|tap" | sed -n '1!p' | grep -P -o -m 1 '^[^:]+')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
@@ -71,6 +27,50 @@ fi
 docker_network_cidr=$(ipcalc "${docker_ip}" "${docker_mask}" | grep -P -o -m 1 "(?<=Network:)\s+[^\s]+")
 echo "[info] Docker network defined as ${docker_network_cidr}"
 
+# ip route
+###
+
+# split comma seperated string into list from LAN_NETWORK env variable
+IFS=',' read -ra lan_network_list <<< "${LAN_NETWORK}"
+
+# process lan networks in the list
+for lan_network_item in "${lan_network_list[@]}"; do
+
+	# strip whitespace from start and end of lan_network_item
+	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+
+	echo "[info] Adding ${lan_network_item} as route via docker lan interface"
+	ip route add "${lan_network_item}" via "${DEFAULT_GATEWAY}" dev "${docker_interface}"
+
+done
+
+echo "[info] ip route defined as follows..."
+echo "--------------------"
+ip route
+echo "--------------------"
+
+# setup iptables marks to allow routing of defined ports via lan interface"
+###
+
+if [[ "${DEBUG}" == "true" ]]; then
+	echo "[debug] Modules currently loaded for kernel" ; lsmod
+fi
+
+# check we have iptable_mangle, if so setup fwmark
+lsmod | grep iptable_mangle
+iptable_mangle_exit_code=$?
+
+if [[ $iptable_mangle_exit_code == 0 ]]; then
+
+	echo "[info] iptable_mangle support detected, adding fwmark for tables"
+
+	# setup route for qbittorrent http using set-mark to route traffic for port WEBUI_PORT to lan
+	echo "${WEBUI_PORT}    qbittorrent_http" >> /etc/iproute2/rt_tables
+	ip rule add fwmark 1 table qbittorrent_http
+	ip route add default via $DEFAULT_GATEWAY table qbittorrent_http
+
+fi
+
 # input iptable rules
 ###
 
@@ -87,11 +87,11 @@ iptables -A INPUT -i "${VPN_DEVICE_TYPE}" -j ACCEPT
 iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
 
 # accept input to vpn gateway
-iptables -A INPUT -i eth0 -p $VPN_PROTOCOL --sport $VPN_PORT -j ACCEPT
+iptables -A INPUT -i "${docker_interface}" -p $VPN_PROTOCOL --sport $VPN_PORT -j ACCEPT
 
 # accept input to qbittorrent port WEBUI_PORT
-iptables -A INPUT -i eth0 -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
-iptables -A INPUT -i eth0 -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
+iptables -A INPUT -i "${docker_interface}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
+iptables -A INPUT -i "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -100,11 +100,11 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 
 	# accept input to qbittorrent api - used for lan access
-	iptables -A INPUT -i eth0 -s "${lan_network_item}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
+	iptables -A INPUT -i "${docker_interface}" -s "${lan_network_item}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
 
 	# accept input to privoxy if enabled
 	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
-		iptables -A INPUT -i eth0 -p tcp -s "${lan_network_item}" -d "${docker_network_cidr}" -j ACCEPT
+		iptables -A INPUT -i "${docker_interface}" -p tcp -s "${lan_network_item}" -d "${docker_network_cidr}" -j ACCEPT
 	fi
 
 done
@@ -131,7 +131,7 @@ iptables -A OUTPUT -o "${VPN_DEVICE_TYPE}" -j ACCEPT
 iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
 
 # accept output from vpn gateway
-iptables -A OUTPUT -o eth0 -p $VPN_PROTOCOL --dport $VPN_PORT -j ACCEPT
+iptables -A OUTPUT -o "${docker_interface}" -p $VPN_PROTOCOL --dport $VPN_PORT -j ACCEPT
 
 # if iptable mangle is available (kernel module) then use mark
 if [[ $iptable_mangle_exit_code == 0 ]]; then
@@ -143,8 +143,8 @@ if [[ $iptable_mangle_exit_code == 0 ]]; then
 fi
 
 # accept output from qbittorrent port WEBUI_PORT - used for lan access
-iptables -A OUTPUT -o eth0 -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
+iptables -A OUTPUT -o "${docker_interface}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
+iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -153,11 +153,11 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 
 	# accept output to qbittorrent api - used for lan access
-	iptables -A OUTPUT -o eth0 -d "${lan_network_item}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
+	iptables -A OUTPUT -o "${docker_interface}" -d "${lan_network_item}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 	# accept output from privoxy if enabled - used for lan access
 	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
-		iptables -A OUTPUT -o eth0 -p tcp -s "${docker_network_cidr}" -d "${lan_network_item}" -j ACCEPT
+		iptables -A OUTPUT -o "${docker_interface}" -p tcp -s "${docker_network_cidr}" -d "${lan_network_item}" -j ACCEPT
 	fi
 
 done
