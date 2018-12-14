@@ -5,7 +5,7 @@ if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
 	export VPN_PROTOCOL="tcp"
 fi
 
-# identify docker bridge interface name (probably "${docker_interface}")
+# identify docker bridge interface name (probably eth0)
 docker_interface=$(netstat -ie | grep -vE "lo|tun|tap" | sed -n '1!p' | grep -P -o -m 1 '^[^:]+')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
