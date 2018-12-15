@@ -66,8 +66,6 @@ while true; do
 
 			else
 
-				echo "[info] qBittorrent running"
-
 				# mark as qbittorrent as running
 				qbittorrent_running="true"
 
