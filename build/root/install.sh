@@ -126,7 +126,14 @@ fi
 
 export VPN_ENABLED=$(echo "${VPN_ENABLED}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 if [[ ! -z "${VPN_ENABLED}" ]]; then
-	echo "[info] VPN_ENABLED defined as '${VPN_ENABLED}'" | ts '%Y-%m-%d %H:%M:%.S'
+	if [ "${VPN_ENABLED}" != "no" ] && [ "${VPN_ENABLED}" != "No" ] && [ "${VPN_ENABLED}" != "NO" ]; then
+		export VPN_ENABLED="yes"
+		echo "[info] VPN_ENABLED defined as '${VPN_ENABLED}'" | ts '%Y-%m-%d %H:%M:%.S'
+	else
+		export VPN_ENABLED="no"
+		echo "[info] VPN_ENABLED defined as '${VPN_ENABLED}'" | ts '%Y-%m-%d %H:%M:%.S'
+		echo "[warn] !!IMPORTANT!! VPN IS SET TO DISABLED', YOU WILL NOT BE SECURE" | ts '%Y-%m-%d %H:%M:%.S'
+	fi
 else
 	echo "[warn] VPN_ENABLED not defined,(via -e VPN_ENABLED), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
 	export VPN_ENABLED="yes"
@@ -296,8 +303,6 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export ENABLE_PRIVOXY="no"
 	fi
 
-elif [[ $VPN_ENABLED == "no" ]]; then
-	echo "[warn] !!IMPORTANT!! You have set the VPN to disabled, you will NOT be secure!" | ts '%Y-%m-%d %H:%M:%.S'
 fi
 
 export WEBUI_PORT=$(echo "${WEBUI_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
