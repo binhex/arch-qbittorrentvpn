@@ -8,7 +8,7 @@ if [[ "${qbittorrent_running}" == "false" ]]; then
 	echo "[info] Attempting to start qBittorrent..."
 
 	# run qBittorrent (daemonized, non-blocking) - note qbittorrent requires docker privileged flag
-	/usr/bin/qbittorrent-nox --daemon --webui-port="${WEBUI_PORT}" --profile=/config --relative-fastresume
+	/usr/bin/qbittorrent-nox --daemon --webui-port="${WEBUI_PORT}" --profile=/config
 
 	# make sure process qbittorrent-nox DOES exist
 	retry_count=30
