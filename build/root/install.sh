@@ -47,6 +47,18 @@ aur_packages=""
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
 
+# custom
+####
+
+# this is a (temporary?) hack to prevent the error '/usr/bin/qbittorrent-nox: 
+# error while loading shared libraries: libQt5Core.so.5: cannot open shared 
+# object file: No such file or directory.' when running this container on 
+# hosts with older kernels (centos, mac os). alternative workaround to this
+# is for the user to upgrade the kernel on their host.
+pacman -S binutils --needed --noconfirm
+strip --remove-section=.note.ABI-tag /usr/lib64/libQt5Core.so.5
+pacman -Rsn binutils --noconfirm
+
 # container perms
 ####
 
