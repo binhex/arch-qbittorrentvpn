@@ -1,4 +1,4 @@
-FROM binhex/arch-openvpn:latest
+FROM binhex/arch-int-openvpn:latest
 MAINTAINER binhex
 
 # additional files
