@@ -12,6 +12,9 @@ set -e
 echo 'Server = http://mirror.bytemark.co.uk/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 echo 'Server = http://archlinux.mirrors.uk2.net/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 
+# download fresh package databases from the server
+pacman -Fyy --noconfirm
+
 # sync package databases for pacman
 pacman -Syyu --noconfirm
 
