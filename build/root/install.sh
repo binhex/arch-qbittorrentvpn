@@ -3,21 +3,6 @@
 # exit script if return code != 0
 set -e
 
-# we cannot build from src currently due to this issue:- https://stackoverflow.com/questions/51027703/mxe-qt5-application-builds-fail-in-docker-container
-# we cannot use aur as this is not headless version and also doesnt build (see above).
-# we cannot use pacman as qbittorrent could be out of date (pointing at archive)
-# we cannot pull packages from aor as this may cause a package mismatch (due to point in time archive)
-
-# due to the above we are resetting to live repo and using pacman for this app.
-echo 'Server = http://mirror.bytemark.co.uk/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-echo 'Server = http://archlinux.mirrors.uk2.net/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
-
-# download fresh package databases from the server
-pacman -Fyy --noconfirm
-
-# sync package databases for pacman
-pacman -Syyu --noconfirm
-
 # build scripts
 ####
 
@@ -32,6 +17,9 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /root/
 
 # pacman packages
 ####
+
+# call pacman db and package updater script
+source /root/upd.sh
 
 # define pacman packages
 pacman_packages="qbittorrent-nox python unrar geoip gnu-netcat ipcalc"
