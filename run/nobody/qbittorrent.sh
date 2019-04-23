@@ -19,8 +19,9 @@ if [[ "${qbittorrent_running}" == "false" ]]; then
 			retry_count=$((retry_count-1))
 			if [ "${retry_count}" -eq "0" ]; then
 
-				echo "[warn] Wait for qBittorrent process to start aborted"
-				break
+				echo "[warn] Wait for qBittorrent process to start aborted, too many retries"
+				echo "[warn] Showing output from command before exit..."
+				timeout 10 yes | /usr/bin/qbittorrent-nox --webui-port="${WEBUI_PORT}" --profile=/config ; exit 1
 
 			else
 
@@ -46,6 +47,8 @@ if [[ "${qbittorrent_running}" == "false" ]]; then
 	while [[ $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".${WEBUI_PORT}\"") == "" ]]; do
 		sleep 0.1
 	done
+
+	echo "[info] qBittorrent process listening on port ${WEBUI_PORT}"
 
 fi
 
