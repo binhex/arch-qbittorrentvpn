@@ -75,7 +75,7 @@ docker run -d \
     -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
-    -e NAME_SERVERS=209.222.18.222,37.235.1.174,1.1.1.1,8.8.8.8,209.222.18.218,37.235.1.177,1.0.0.1,8.8.4.4 \
+    -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e DEBUG=false \
     -e WEBUI_PORT=8080 \
     -e UMASK=000 \
@@ -119,7 +119,7 @@ docker run -d \
     -e VPN_PROV=airvpn \
     -e ENABLE_PRIVOXY=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
-    -e NAME_SERVERS=209.222.18.222,37.235.1.174,8.8.8.8,209.222.18.218,37.235.1.177,8.8.4.4 \
+    -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e DEBUG=false \
     -e WEBUI_PORT=8080 \
     -e UMASK=000 \
@@ -139,6 +139,14 @@ https://www.privateinternetaccess.com/openvpn/openvpn.zip
 Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
 
 If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
+
+Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
+The list of default NS providers in the above example(s) is as follows:-
+
+209.222.x.x = PIA
+84.200.x.x = DNS Watch
+37.235.x.x = FreeDNS
+1.x.x.x = Cloudflare
 
 User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
 
