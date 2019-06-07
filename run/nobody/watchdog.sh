@@ -21,7 +21,7 @@ echo "[info] Removing session lock file (if it exists)..."
 rm -f /config/qBittorrent/data/BT_backup/session.lock
 
 # force unix line endings conversion in case user edited qbittorrent.conf with notepad
-dos2unix "${qbittorrent_config}"
+/root/dos2unix-wrapper.sh "${qbittorrent_config}"
 
 # set locale to prevent 4.1.4 gui render issues if no locale set
 grep -q 'General\\Locale' "${qbittorrent_config}" || sed -i '/\[Preferences\]/a General\\Locale=en' "${qbittorrent_config}"
