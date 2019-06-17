@@ -179,7 +179,7 @@ iptables -A OUTPUT -o "${VPN_DEVICE_TYPE}" -j ACCEPT
 
 echo "[info] iptables defined as follows..."
 echo "--------------------"
-iptables -S
+iptables -S 2>&1 | tee /tmp/checkiptables
 echo "--------------------"
 
 # change iptable 'tcp' to openvpn config compatible 'tcp-client' (this file is sourced)

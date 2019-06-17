@@ -153,6 +153,9 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	# force removal of mac os resource fork files in ovpn folder
 	rm -rf /config/openvpn/._*.ovpn
 
+	# remove temporary file from previous run, used to confirm all iptables chain policies are set to drop
+	rm -f /tmp/checkiptables || true
+
 	# wildcard search for openvpn config files (match on first result)
 	export VPN_CONFIG=$(find /config/openvpn -maxdepth 1 -name "*.ovpn" -print -quit)
 
