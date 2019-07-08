@@ -80,21 +80,21 @@ chmod -R 775 ${install_paths}
 cat <<EOF > /tmp/permissions_heredoc
 
 # get previous puid/pgid (if first run then will be empty string)
-previous_puid=\$(cat "/tmp/puid" 2>/dev/null || true)
-previous_pgid=\$(cat "/tmp/pgid" 2>/dev/null || true)
+previous_puid=\$(cat "/root/puid" 2>/dev/null || true)
+previous_pgid=\$(cat "/root/pgid" 2>/dev/null || true)
 
 # if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different 
 # from the previous run then re-apply chown with current PUID and PGID values.
-if [[ ! -f "/tmp/puid" || ! -f "/tmp/pgid" || "\${previous_puid}" != "\${PUID}" || "\${previous_pgid}" != "\${PGID}" ]]; then
+if [[ ! -f "/root/puid" || ! -f "/root/pgid" || "\${previous_puid}" != "\${PUID}" || "\${previous_pgid}" != "\${PGID}" ]]; then
 
 	# set permissions inside container - Do NOT double quote variable for install_paths otherwise this will wrap space separated paths as a single string
 	chown -R "\${PUID}":"\${PGID}" ${install_paths}
 
 fi
 
-# write out current PUID and PGID to files in /tmp (used to compare on next run)
-echo "\${PUID}" > /tmp/puid
-echo "\${PGID}" > /tmp/pgid
+# write out current PUID and PGID to files in /root (used to compare on next run)
+echo "\${PUID}" > /root/puid
+echo "\${PGID}" > /root/pgid
 
 EOF
 
