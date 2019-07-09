@@ -297,8 +297,6 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export ENABLE_PRIVOXY="no"
 	fi
 
-	export RUN_UP_SCRIPT="yes"
-
 fi
 
 export WEBUI_PORT=$(echo "${WEBUI_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
