@@ -46,7 +46,8 @@ while true; do
 	qbittorrent_running="false"
 	privoxy_running="false"
 	ip_change="false"
-	port_change="false"
+	vpn_port_change="false"
+	qbittorrent_port_change="false"
 
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
 
@@ -106,7 +107,7 @@ while true; do
 					VPN_INCOMING_PORT="${qbittorrent_port}"
 
 					# ignore port change as we cannot detect new port
-					port_change="false"
+					qbittorrent_port_change="false"
 
 				else
 
@@ -129,7 +130,7 @@ while true; do
 						echo "[info] qBittorrent incoming port $qbittorrent_port and VPN incoming port ${VPN_INCOMING_PORT} different, marking for reconfigure"
 
 						# mark as reconfigure required due to mismatch
-						port_change="true"
+						qbittorrent_port_change="true"
 
 					fi
 
@@ -137,10 +138,17 @@ while true; do
 
 			fi
 
-			if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${qbittorrent_running}" == "false" ]]; then
+			if [[ "${qbittorrent_port_change}" == "true" || "${ip_change}" == "true" || "${qbittorrent_running}" == "false" ]]; then
 
 				# run script to start qbittorrent, it can also perform shutdown of qbittorrent if its already running (required for port/ip change)
 				source /home/nobody/qbittorrent.sh
+
+			fi
+
+			# if port is detected as closed then create empty file to trigger restart of openvpn process (restart code in /root/openvpn.sh)
+			if [[ "${vpn_port_change}" == "true" ]];then
+
+				touch "/tmp/portclosed"
 
 			fi
 
