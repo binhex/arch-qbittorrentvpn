@@ -22,7 +22,7 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /usr/local/bin/
 source upd.sh
 
 # define pacman packages
-pacman_packages="qbittorrent-nox python unrar geoip"
+pacman_packages="qbittorrent-nox python geoip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
