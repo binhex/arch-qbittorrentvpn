@@ -307,6 +307,8 @@ else
 	export WEBUI_PORT="8080"
 fi
 
+export APPLICATION="qbittorrent"
+
 EOF
 
 # replace env vars placeholder string with contents of file (here doc)
