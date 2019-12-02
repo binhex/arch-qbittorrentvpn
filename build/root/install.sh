@@ -167,7 +167,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	/usr/local/bin/dos2unix.sh "${VPN_CONFIG}"
 
 	# get first matching 'remote' line in ovpn
-	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '^(\s+)?remote\s.*')
+	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '^(\s+)?remote\s.*' || true)
 
 	if [ -n "${vpn_remote_line}" ]; then
 
