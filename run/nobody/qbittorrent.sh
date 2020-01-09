@@ -56,8 +56,8 @@ fi
 # option 'Bypass authentication for clients on localhost'
 if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-	curl -i -X POST -d "json={\"random_port\": false}" "http://localhost:2100/api/v2/app/setPreferences" &> /dev/null
-	curl -i -X POST -d "json={\"listen_port\": ${VPN_INCOMING_PORT}}" "http://localhost:2100/api/v2/app/setPreferences" &> /dev/null
+	curl -i -X POST -d "json={\"random_port\": false}" "http://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
+	curl -i -X POST -d "json={\"listen_port\": ${VPN_INCOMING_PORT}}" "http://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
 
 	# set qbittorrent port to current vpn port (used when checking for changes on next run)s
 	qbittorrent_port="${VPN_INCOMING_PORT}"
