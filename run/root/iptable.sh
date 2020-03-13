@@ -5,8 +5,10 @@ if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
 	export VPN_PROTOCOL="tcp"
 fi
 
-# identify docker bridge interface name (probably eth0)
-docker_interface=$(netstat -ie | grep -vE "lo|tun|tap" | sed -n '1!p' | grep -P -o -m 1 '^[^:]+')
+# identify docker bridge interface name by looking at routing to
+# vpn provider remote endpoint (first ip address from name 
+# lookup in /root/start.sh)
+docker_interface=$(ip route show to match "${remote_dns_answer_first}" | grep -P -o -m 1 '[a-zA-Z0-9]+\s?+$' | tr -d '[:space:]')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
 fi
