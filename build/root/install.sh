@@ -309,6 +309,10 @@ fi
 
 export APPLICATION="qbittorrent"
 
+# set stack size from unlimited to prevent pgrep allocation memory bug
+# see here for details on the bug (open) https://gitlab.com/procps-ng/procps/issues/152
+ulimit -s 8192
+
 EOF
 
 # replace env vars placeholder string with contents of file (here doc)
