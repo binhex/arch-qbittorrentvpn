@@ -92,6 +92,28 @@ iptables -A INPUT -i "${docker_interface}" -p $VPN_PROTOCOL --sport $VPN_PORT -j
 iptables -A INPUT -i "${docker_interface}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
 iptables -A INPUT -i "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
+# additional port list for scripts or container linking
+if [[ ! -z "${ADDITIONAL_PORTS}" ]]; then
+
+	# split comma separated string into list from ADDITIONAL_PORTS env variable
+	IFS=',' read -ra additional_port_list <<< "${ADDITIONAL_PORTS}"
+
+	# process additional ports in the list
+	for additional_port_item in "${additional_port_list[@]}"; do
+
+		# strip whitespace from start and end of additional_port_item
+		additional_port_item=$(echo "${additional_port_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+
+		echo "[info] Adding additional incoming port ${additional_port_item} for ${docker_interface}"
+
+		# accept input to additional port for "${docker_interface}"
+		iptables -A INPUT -i "${docker_interface}" -p tcp --dport "${additional_port_item}" -j ACCEPT
+		iptables -A INPUT -i "${docker_interface}" -p tcp --sport "${additional_port_item}" -j ACCEPT
+
+	done
+
+fi
+
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
 
@@ -153,6 +175,28 @@ fi
 # accept output from qbittorrent port WEBUI_PORT - used for lan access
 iptables -A OUTPUT -o "${docker_interface}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
 iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
+
+# additional port list for scripts or container linking
+if [[ ! -z "${ADDITIONAL_PORTS}" ]]; then
+
+	# split comma separated string into list from ADDITIONAL_PORTS env variable
+	IFS=',' read -ra additional_port_list <<< "${ADDITIONAL_PORTS}"
+
+	# process additional ports in the list
+	for additional_port_item in "${additional_port_list[@]}"; do
+
+		# strip whitespace from start and end of additional_port_item
+		additional_port_item=$(echo "${additional_port_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+
+		echo "[info] Adding additional outgoing port ${additional_port_item} for ${docker_interface}"
+
+		# accept output to additional port for lan interface
+		iptables -A OUTPUT -o "${docker_interface}" -p tcp --dport "${additional_port_item}" -j ACCEPT
+		iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport "${additional_port_item}" -j ACCEPT
+
+	done
+
+fi
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
