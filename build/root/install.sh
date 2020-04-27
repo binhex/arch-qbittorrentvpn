@@ -48,7 +48,6 @@ source aur.sh
 # is for the user to upgrade the kernel on their host.
 pacman -S binutils --needed --noconfirm
 strip --remove-section=.note.ABI-tag /usr/lib64/libQt5Core.so.5
-pacman -Rsn binutils --noconfirm
 
 # container perms
 ####
