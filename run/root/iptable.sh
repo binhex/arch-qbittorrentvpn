@@ -1,13 +1,34 @@
 #!/bin/bash
 
+if [ -e /config/openvpn/vpnremotelist ] ; then
+	# retrieve the VPN_REMOTE_LIST, VPN_PROTOCOL_LIST, and VPN_PORT_LIST
+	readarray VPN_REMOTE_LIST < <(cat /config/openvpn/vpnremotelist | awk '{print $1}')
+	readarray VPN_PORT_LIST < <(cat /config/openvpn/vpnremotelist | awk '{print $2}')
+	readarray VPN_PROTOCOL_LIST < <(cat /config/openvpn/vpnremotelist | awk '{print $3}')
+	for i in $(seq 0 $((${#VPN_REMOTE_LIST[@]} - 1))) ; do
+		VPN_REMOTE_LIST[$i]=$(echo "${VPN_REMOTE_LIST[$i]}" | tr -d '[:space:]')
+		VPN_PORT_LIST[$i]=$(echo "${VPN_PORT_LIST[$i]}" | tr -d '[:space:]')
+		VPN_PROTOCOL_LIST[$i]=$(echo "${VPN_PROTOCOL_LIST[$i]}" | tr -d '[:space:]')
+	done
+fi
+
 # change openvpn config 'tcp-client' to compatible iptables 'tcp'
+if [ ${#VPN_PORT_LIST[@]} -gt 0 ] ; then
+	for i in $(seq 0 $((${#VPN_PORT_LIST[@]} - 1))); do
+		# change openvpn config 'tcp-client' to compatible iptables 'tcp'
+		if [[ "${VPN_PROTOCOL_LIST[$i]}" == "tcp-client" ]]; then
+			export VPN_PROTOCOL_LIST[$i]="tcp"
+		fi
+	done
+fi
+# deprecated, but make sure it's correct anyway in case it's still used
 if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
 	export VPN_PROTOCOL="tcp"
 fi
 
 # identify docker bridge interface name by looking at routing to
 # vpn provider remote endpoint (first ip address from name 
-# lookup in /root/start.sh)
+# lookup in /root/start.sh
 docker_interface=$(ip route show to match "${remote_dns_answer_first}" | grep -P -o -m 1 '[a-zA-Z0-9]+\s?+$' | tr -d '[:space:]')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
@@ -85,8 +106,14 @@ ip6tables -P INPUT DROP 1>&- 2>&-
 # accept input to/from docker containers (172.x range is internal dhcp)
 iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
 
-# accept input to vpn gateway
-iptables -A INPUT -i "${docker_interface}" -p $VPN_PROTOCOL --sport $VPN_PORT -j ACCEPT
+# accept input to vpn gateway for all port/protocols specified
+if [ ${#VPN_PORT_LIST[@]} -gt 0 ] ; then
+	for i in $(seq 0 $((${#VPN_PORT_LIST[@]} - 1))); do
+		iptables -A INPUT -i "${docker_interface}" -p ${VPN_PROTOCOL_LIST[$i]} --sport ${VPN_PORT_LIST[$i]} -j ACCEPT
+	done
+elif [[ -n "${VPN_PROTOCOL}" ]] && [[ -n "${VPN_PORT}" ]] ; then
+	iptables -A INPUT -i "${docker_interface}" -p $VPN_PROTOCOL --sport $VPN_PORT -j ACCEPT
+fi
 
 # accept input to qbittorrent port WEBUI_PORT
 iptables -A INPUT -i "${docker_interface}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
@@ -160,8 +187,14 @@ ip6tables -P OUTPUT DROP 1>&- 2>&-
 # accept output to/from docker containers (172.x range is internal dhcp)
 iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
 
-# accept output from vpn gateway
-iptables -A OUTPUT -o "${docker_interface}" -p $VPN_PROTOCOL --dport $VPN_PORT -j ACCEPT
+# accept output from vpn gateway for all port/protocols specified
+if [ ${#VPN_PORT_LIST[@]} -gt 0 ] ; then
+	for i in $(seq 0 $((${#VPN_PORT_LIST[@]} - 1))); do
+		iptables -A OUTPUT -o "${docker_interface}" -p ${VPN_PROTOCOL_LIST[$i]} --dport ${VPN_PORT_LIST[$i]} -j ACCEPT
+	done
+elif [[ -n "${VPN_PROTOCOL}" ]] && [[ -n "${VPN_PORT}" ]] ; then
+	iptables -A OUTPUT -o "${docker_interface}" -p $VPN_PROTOCOL --dport $VPN_PORT -j ACCEPT
+fi
 
 # if iptable mangle is available (kernel module) then use mark
 if [[ $iptable_mangle_exit_code == 0 ]]; then
@@ -229,7 +262,15 @@ iptables -S 2>&1 | tee /tmp/getiptables
 chmod +r /tmp/getiptables
 echo "--------------------"
 
-# change iptable 'tcp' to openvpn config compatible 'tcp-client' (this file is sourced)
+# change iptable 'tcp' back to openvpn config compatible 'tcp-client' (this file is sourced)
+if [ ${#VPN_PORT_LIST[@]} -gt 0 ] ; then
+	for i in $(seq 0 $((${#VPN_PORT_LIST[@]} - 1))); do
+		# change openvpn config 'tcp-client' to compatible iptables 'tcp'
+		if [[ "${VPN_PROTOCOL_LIST[$i]}" == "tcp" ]]; then
+			export VPN_PROTOCOL_LIST[$i]="tcp-client"
+		fi
+	done
+fi
 if [[ "${VPN_PROTOCOL}" == "tcp" ]]; then
 	export VPN_PROTOCOL="tcp-client"
 fi
