@@ -181,60 +181,66 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	# convert CRLF (windows) to LF (unix) for ovpn
 	/usr/local/bin/dos2unix.sh "${VPN_CONFIG}"
 
-	# get first matching 'remote' line in ovpn
-	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '^(\s+)?remote\s.*' || true)
+	# get all remote lines in ovpn file and save comma separated
+	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=remote\s).*' | paste -s -d, - || true)
 
-	if [ -n "${vpn_remote_line}" ]; then
+	if [[ -n "${vpn_remote_line}" ]]; then
 
-		# remove all remote lines as we cannot cope with multi remote lines
-		sed -i -E '/^(\s+)?remote\s.*/d' "${VPN_CONFIG}"
+		# split comma separated string into list from vpn_remote_line variable
+		IFS=',' read -ra vpn_remote_line_list <<< "${vpn_remote_line}"
 
-		# if remote line contains comments then remove
-		vpn_remote_line=$(echo "${vpn_remote_line}" | sed -r 's~\s?+#.*$~~g')
+		# process each remote line from ovpn file
+		for vpn_remote_line_item in "${vpn_remote_line_list[@]}"; do
 
-		# if remote line contains old format 'tcp' then replace with newer 'tcp-client' format
-		vpn_remote_line=$(echo "${vpn_remote_line}" | sed "s/tcp$/tcp-client/g")
+			# if remote line contains comments then remove
+			vpn_remote_line_item=$(echo "${vpn_remote_line_item}" | sed -r 's~\s?+#.*$~~g')
 
-		# write the single remote line back to the ovpn file on line 1
-		sed -i -e "1i${vpn_remote_line}" "${VPN_CONFIG}"
+			vpn_remote_server_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f1 || true)
 
-		echo "[info] VPN remote line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
+			if [[ -z "${vpn_remote_server_cut}" ]]; then
+				echo "[warn] VPN configuration file ${VPN_CONFIG} remote line is missing or malformed, skipping to next remote line..." | ts '%Y-%m-%d %H:%M:%.S'
+				continue
+			fi
+
+			vpn_remote_port_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f2 || true)
+
+			if [[ -z "${vpn_remote_port_cut}" ]]; then
+				echo "[warn] VPN configuration file ${VPN_CONFIG} remote port is missing or malformed, assuming port '1194'" | ts '%Y-%m-%d %H:%M:%.S'
+				vpn_remote_port_cut="1194"
+			fi
+
+			vpn_remote_protocol_cut=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=proto\s).*' || true)
+			if [[ -z "${vpn_remote_protocol_cut}" ]]; then
+				vpn_remote_protocol_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f3 || true)
+				if [[ -z "${vpn_remote_protocol_cut}" ]]; then
+					echo "[warn] VPN configuration file ${VPN_CONFIG} remote protocol is missing or malformed, assuming protocol 'udp'" | ts '%Y-%m-%d %H:%M:%.S'
+					vpn_remote_protocol_cut="udp"
+				fi
+			fi
+			if [[ "${vpn_remote_protocol_cut}" == "tcp" ]]; then
+				# if remote line contains old format 'tcp' then replace with newer 'tcp-client' format
+				vpn_remote_protocol_cut="tcp-client"
+			fi
+
+			vpn_remote_server+="${vpn_remote_server_cut},"
+			vpn_remote_port+="${vpn_remote_port_cut},"
+			vpn_remote_protocol+="${vpn_remote_protocol_cut},"
+
+		done
+
+		echo "[info] VPN remote server(s) defined as '${vpn_remote_server}'" | ts '%Y-%m-%d %H:%M:%.S'
+		echo "[info] VPN remote port(s) defined as '${vpn_remote_port}'" | ts '%Y-%m-%d %H:%M:%.S'
+		echo "[info] VPN remote protocol(s) defined as '${vpn_remote_protocol}'" | ts '%Y-%m-%d %H:%M:%.S'
+
+		export VPN_REMOTE_SERVER="${vpn_remote_server}"
+		export VPN_REMOTE_PORT="${vpn_remote_port}"
+		export VPN_REMOTE_PROTOCOL="${vpn_remote_protocol}"
 
 	else
 
 		echo "[crit] VPN configuration file ${VPN_CONFIG} does not contain 'remote' line, showing contents of file before exit..." | ts '%Y-%m-%d %H:%M:%.S'
 		cat "${VPN_CONFIG}" && exit 1
 
-	fi
-
-	export VPN_REMOTE=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '(?<=remote\s)[^\s]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${VPN_REMOTE}" ]]; then
-		echo "[info] VPN_REMOTE defined as '${VPN_REMOTE}'" | ts '%Y-%m-%d %H:%M:%.S'
-	else
-		echo "[crit] VPN_REMOTE not found in ${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
-	fi
-
-	export VPN_PORT=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '\d{2,5}(\s?)+(tcp|udp|tcp-client)?$' | grep -P -o -m 1 '\d+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${VPN_PORT}" ]]; then
-		echo "[info] VPN_PORT defined as '${VPN_PORT}'" | ts '%Y-%m-%d %H:%M:%.S'
-	else
-		echo "[crit] VPN_PORT not found in ${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
-	fi
-
-	# if 'proto' is old format 'tcp' then forcibly set to newer 'tcp-client' format
-	sed -i "s/^proto\stcp$/proto tcp-client/g" "${VPN_CONFIG}"
-
-	export VPN_PROTOCOL=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^proto\s)[^\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${VPN_PROTOCOL}" ]]; then
-		echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
-	else
-		export VPN_PROTOCOL=$(echo "${vpn_remote_line}" | grep -P -o -m 1 'udp|tcp-client|tcp$' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-		if [[ ! -z "${VPN_PROTOCOL}" ]]; then
-			echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
-		else
-			echo "[warn] VPN_PROTOCOL not found in ${VPN_CONFIG}, assuming udp" | ts '%Y-%m-%d %H:%M:%.S'
-			export VPN_PROTOCOL="udp"
-		fi
 	fi
 
 	VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^dev\s)[^\r\n\d]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
