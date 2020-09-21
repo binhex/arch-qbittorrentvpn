@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# change openvpn config 'tcp-client' to compatible iptables 'tcp'
-if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
-	export VPN_PROTOCOL="tcp"
-fi
-
 # identify docker bridge interface name by looking at routing to
 # vpn provider remote endpoint (first ip address from name 
 # lookup in /root/start.sh)
@@ -94,15 +89,21 @@ iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACC
 # iterate over array and add all remote vpn ports and protocols
 for index in "${!vpn_remote_port_list[@]}"; do
 
+	# change openvpn config 'tcp-client' to compatible iptables 'tcp'
+	if [[ "${vpn_remote_protocol_list[$index]}" == "tcp-client" ]]; then
+		vpn_remote_protocol_list="tcp"
+	else
+		vpn_remote_protocol_list="${vpn_remote_protocol_list[$index]}"
+	fi
+
 	# note grep -e is required to indicate no flags follow to prevent -A from being incorrectly picked up
-	rule_exists=$(iptables -S | grep -e "-A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" -m "${vpn_remote_protocol_list[$index]}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT")
+	rule_exists=$(iptables -S | grep -e "-A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list}" -m "${vpn_remote_protocol_list}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT")
 	if [[ -z "${rule_exists}" ]]; then
 		# accept input to vpn gateway
-		iptables -A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT
+		iptables -A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT
 	fi
 
 done
-
 # accept input to qbittorrent port WEBUI_PORT
 iptables -A INPUT -i "${docker_interface}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
 iptables -A INPUT -i "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
@@ -178,11 +179,18 @@ iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j AC
 # iterate over array and add all remote vpn ports and protocols
 for index in "${!vpn_remote_port_list[@]}"; do
 
+	# change openvpn config 'tcp-client' to compatible iptables 'tcp'
+	if [[ "${vpn_remote_protocol_list[$index]}" == "tcp-client" ]]; then
+		vpn_remote_protocol_list="tcp"
+	else
+		vpn_remote_protocol_list="${vpn_remote_protocol_list[$index]}"
+	fi
+
 	# note grep -e is required to indicate no flags follow to prevent -A from being incorrectly picked up
-	rule_exists=$(iptables -S | grep -e "-A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" -m "${vpn_remote_protocol_list[$index]}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT")
+	rule_exists=$(iptables -S | grep -e "-A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list}" -m "${vpn_remote_protocol_list}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT")
 	if [[ -z "${rule_exists}" ]]; then
 		# accept output from vpn gateway
-		iptables -A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT
+		iptables -A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT
 	fi
 
 done
@@ -252,8 +260,3 @@ echo "--------------------"
 iptables -S 2>&1 | tee /tmp/getiptables
 chmod +r /tmp/getiptables
 echo "--------------------"
-
-# change iptable 'tcp' to openvpn config compatible 'tcp-client' (this file is sourced)
-if [[ "${VPN_PROTOCOL}" == "tcp" ]]; then
-	export VPN_PROTOCOL="tcp-client"
-fi
