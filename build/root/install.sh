@@ -182,7 +182,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	/usr/local/bin/dos2unix.sh "${VPN_CONFIG}"
 
 	# get all remote lines in ovpn file and save comma separated
-	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=remote\s).*' | paste -s -d, - || true)
+	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=^remote\s).*' | paste -s -d, - || true)
 
 	if [[ -n "${vpn_remote_line}" ]]; then
 
@@ -209,7 +209,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 				vpn_remote_port_cut="1194"
 			fi
 
-			vpn_remote_protocol_cut=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=proto\s).*' || true)
+			vpn_remote_protocol_cut=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=^proto\s).*' || true)
 			if [[ -z "${vpn_remote_protocol_cut}" ]]; then
 				vpn_remote_protocol_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f3 || true)
 				if [[ -z "${vpn_remote_protocol_cut}" ]]; then
