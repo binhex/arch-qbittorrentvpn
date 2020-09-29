@@ -57,9 +57,9 @@ source aur.sh
 # custom
 ####
 
-# this is a (temporary?) hack to prevent the error '/usr/bin/qbittorrent-nox: 
-# error while loading shared libraries: libQt5Core.so.5: cannot open shared 
-# object file: No such file or directory.' when running this container on 
+# this is a (temporary?) hack to prevent the error '/usr/bin/qbittorrent-nox:
+# error while loading shared libraries: libQt5Core.so.5: cannot open shared
+# object file: No such file or directory.' when running this container on
 # hosts with older kernels (centos, mac os). alternative workaround to this
 # is for the user to upgrade the kernel on their host.
 pacman -S binutils --needed --noconfirm
@@ -68,7 +68,7 @@ strip --remove-section=.note.ABI-tag /usr/lib64/libQt5Core.so.5
 # container perms
 ####
 
-# define comma separated list of paths 
+# define comma separated list of paths
 install_paths="/etc/privoxy,/home/nobody"
 
 # split comma separated string into list for install paths
@@ -98,7 +98,7 @@ cat <<EOF > /tmp/permissions_heredoc
 previous_puid=\$(cat "/root/puid" 2>/dev/null || true)
 previous_pgid=\$(cat "/root/pgid" 2>/dev/null || true)
 
-# if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different 
+# if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different
 # from the previous run then re-apply chown with current PUID and PGID values.
 if [[ ! -f "/root/puid" || ! -f "/root/pgid" || "\${previous_puid}" != "\${PUID}" || "\${previous_pgid}" != "\${PGID}" ]]; then
 
@@ -286,7 +286,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 
 		export VPN_PASS=$(echo "${VPN_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 		if [[ ! -z "${VPN_PASS}" ]]; then
-			echo "[info] VPN_PASS defined as '${VPN_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
+			echo "[info] VPN_PASS is defined" | ts '%Y-%m-%d %H:%M:%.S'
 		else
 			echo "[warn] VPN_PASS not defined (via -e VPN_PASS), assuming authentication via other method" | ts '%Y-%m-%d %H:%M:%.S'
 		fi
