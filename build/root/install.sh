@@ -202,7 +202,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 				continue
 			fi
 
-			vpn_remote_port_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f2 || true)
+			vpn_remote_port_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f2 | grep -P -o '^[\d]{4,5}$' || true)
 
 			if [[ -z "${vpn_remote_port_cut}" ]]; then
 				echo "[warn] VPN configuration file ${VPN_CONFIG} remote port is missing or malformed, assuming port '1194'" | ts '%Y-%m-%d %H:%M:%.S'
