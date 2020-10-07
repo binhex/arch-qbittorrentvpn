@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# identify docker bridge interface name by looking at routing to
-# vpn provider remote endpoint (first ip address from name 
-# lookup in /root/start.sh)
-docker_interface=$(ip route show to match "${remote_dns_answer_first}" | grep -P -o -m 1 '[a-zA-Z0-9]+\s?+$' | tr -d '[:space:]')
+# identify docker bridge interface name by looking at defult route
+docker_interface=$(ip -4 route ls | grep default | xargs | grep -o -P '[^\s]+$')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
 fi
+# identify ip for local gateway (eth0)
+default_gateway=$(ip route show default | awk '/default/ {print $3}')
+echo "[info] Default route for container is ${default_gateway}"
 
 # identify ip for docker bridge interface
 docker_ip=$(ifconfig "${docker_interface}" | grep -P -o -m 1 '(?<=inet\s)[^\s]+')
@@ -55,9 +56,9 @@ fi
 
 # check we have iptable_mangle, if so setup fwmark
 lsmod | grep iptable_mangle
-iptable_mangle_exit_code=$?
+iptable_mangle_exit_code="${?}"
 
-if [[ $iptable_mangle_exit_code == 0 ]]; then
+if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 
 	echo "[info] iptable_mangle support detected, adding fwmark for tables"
 
@@ -140,7 +141,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	iptables -A INPUT -i "${docker_interface}" -s "${lan_network_item}" -p tcp --dport "${WEBUI_PORT}" -j ACCEPT
 
 	# accept input to privoxy if enabled
-	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
+	if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
 		iptables -A INPUT -i "${docker_interface}" -p tcp -s "${lan_network_item}" -d "${docker_network_cidr}" -j ACCEPT
 	fi
 
@@ -196,7 +197,7 @@ for index in "${!vpn_remote_port_list[@]}"; do
 done
 
 # if iptable mangle is available (kernel module) then use mark
-if [[ $iptable_mangle_exit_code == 0 ]]; then
+if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 
 	# accept output from qbittorrent port WEBUI_PORT - used for external access
 	iptables -t mangle -A OUTPUT -p tcp --dport "${WEBUI_PORT}" -j MARK --set-mark 1
@@ -240,7 +241,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	iptables -A OUTPUT -o "${docker_interface}" -d "${lan_network_item}" -p tcp --sport "${WEBUI_PORT}" -j ACCEPT
 
 	# accept output from privoxy if enabled - used for lan access
-	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
+	if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
 		iptables -A OUTPUT -o "${docker_interface}" -p tcp -s "${docker_network_cidr}" -d "${lan_network_item}" -j ACCEPT
 	fi
 
