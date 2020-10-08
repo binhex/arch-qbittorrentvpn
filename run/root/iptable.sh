@@ -65,7 +65,8 @@ if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 	# setup route for qbittorrent http using set-mark to route traffic for port WEBUI_PORT to lan
 	echo "${WEBUI_PORT}    qbittorrent_http" >> /etc/iproute2/rt_tables
 	ip rule add fwmark 1 table qbittorrent_http
-	ip route add default via $DEFAULT_GATEWAY table qbittorrent_http
+	ip route add default via "${default_gateway}" table qbittorrent_http
+
 
 fi
 
