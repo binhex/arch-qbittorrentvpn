@@ -5,6 +5,7 @@ docker_interface=$(ip -4 route ls | grep default | xargs | grep -o -P '[^\s]+$')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
 fi
+
 # identify ip for local gateway (eth0)
 default_gateway=$(ip route show default | awk '/default/ {print $3}')
 echo "[info] Default route for container is ${default_gateway}"
@@ -38,7 +39,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 
 	echo "[info] Adding ${lan_network_item} as route via docker ${docker_interface}"
-	ip route add "${lan_network_item}" via "${DEFAULT_GATEWAY}" dev "${docker_interface}"
+	ip route add "${lan_network_item}" via "${default_gateway}" dev "${docker_interface}"
 
 done
 
