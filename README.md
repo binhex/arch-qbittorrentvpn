@@ -149,7 +149,8 @@ Once you have downloaded the zip (normally a zip as they contain multiple ovpn f
 If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
 
 **WireGuard**  
-If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions, so please ensure you change the following docker flag:-
+If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions, so please ensure you change the following docker flag:-    
+
 from
 ```
     --cap-add=NET_ADMIN \
