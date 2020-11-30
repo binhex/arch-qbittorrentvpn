@@ -72,10 +72,7 @@ if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 fi
 
 # split comma separated string into array for tcp and udp protocols (both required)
-IFS=',' read -ra vpn_remote_protocol_list <<< "tcp,udp"
-
-# split comma separated string into array from VPN_REMOTE_PORT env var
-IFS=',' read -ra vpn_remote_port_list <<< "${VPN_REMOTE_PORT}"
+IFS=',' read -ra vpn_remote_endpoint_protocol_list <<< "tcp,udp"
 
 # input iptable rules
 ###
@@ -92,7 +89,7 @@ iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACC
 # iterate over array and add all remote vpn ports and protocols
 for vpn_remote_port_item in "${vpn_remote_port_list[@]}"; do
 
-	for vpn_remote_protocol_item in "${vpn_remote_protocol_list[@]}"; do
+	for vpn_remote_protocol_item in "${vpn_remote_endpoint_protocol_list[@]}"; do
 
 		# note grep -e is required to indicate no flags follow to prevent -A from being incorrectly picked up
 		rule_exists=$(iptables -S | grep -e "-A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_item}" -m "${vpn_remote_protocol_item}" --sport "${vpn_remote_port_item}" -j ACCEPT")
@@ -179,7 +176,7 @@ iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j AC
 # iterate over array and add all remote vpn ports and protocols
 for vpn_remote_port_item in "${vpn_remote_port_list[@]}"; do
 
-	for vpn_remote_protocol_item in "${vpn_remote_protocol_list[@]}"; do
+	for vpn_remote_protocol_item in "${vpn_remote_endpoint_protocol_list[@]}"; do
 
 		# note grep -e is required to indicate no flags follow to prevent -A from being incorrectly picked up
 		rule_exists=$(iptables -S | grep -e "-A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_item}" -m "${vpn_remote_protocol_item}" --dport "${vpn_remote_port_item}" -j ACCEPT")
