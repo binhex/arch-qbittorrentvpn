@@ -26,11 +26,20 @@ fi
 docker_network_cidr=$(ipcalc "${docker_ip}" "${docker_mask}" | grep -P -o -m 1 "(?<=Network:)\s+[^\s]+")
 echo "[info] Docker network defined as ${docker_network_cidr}"
 
-# ip route
-###
-
 # split comma separated string into list from LAN_NETWORK env variable
 IFS=',' read -ra lan_network_list <<< "${LAN_NETWORK}"
+
+# split comma separated string into array from VPN_REMOTE_PORT env var
+IFS=',' read -ra vpn_remote_port_list <<< "${VPN_REMOTE_PORT}"
+
+# split comma separated string into array for tcp and udp protocols (both required)
+IFS=',' read -ra vpn_remote_endpoint_protocol_list <<< "tcp,udp"
+
+# split comma separated string into list from ADDITIONAL_PORTS env variable
+IFS=',' read -ra additional_port_list <<< "${ADDITIONAL_PORTS}"
+
+# ip route
+###
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -71,9 +80,6 @@ if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 
 fi
 
-# split comma separated string into array for tcp and udp protocols (both required)
-IFS=',' read -ra vpn_remote_endpoint_protocol_list <<< "tcp,udp"
-
 # input iptable rules
 ###
 
@@ -107,9 +113,6 @@ iptables -A INPUT -i "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j ACC
 
 # additional port list for scripts or container linking
 if [[ ! -z "${ADDITIONAL_PORTS}" ]]; then
-
-	# split comma separated string into list from ADDITIONAL_PORTS env variable
-	IFS=',' read -ra additional_port_list <<< "${ADDITIONAL_PORTS}"
 
 	# process additional ports in the list
 	for additional_port_item in "${additional_port_list[@]}"; do
@@ -204,9 +207,6 @@ iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport "${WEBUI_PORT}" -j AC
 
 # additional port list for scripts or container linking
 if [[ ! -z "${ADDITIONAL_PORTS}" ]]; then
-
-	# split comma separated string into list from ADDITIONAL_PORTS env variable
-	IFS=',' read -ra additional_port_list <<< "${ADDITIONAL_PORTS}"
 
 	# process additional ports in the list
 	for additional_port_item in "${additional_port_list[@]}"; do
