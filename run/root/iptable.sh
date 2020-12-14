@@ -38,6 +38,9 @@ IFS=',' read -ra vpn_remote_endpoint_protocol_list <<< "tcp,udp"
 # split comma separated string into list from ADDITIONAL_PORTS env variable
 IFS=',' read -ra additional_port_list <<< "${ADDITIONAL_PORTS}"
 
+# split comma separated string into array for tcp and udp protocols (both required)
+IFS=',' read -ra additional_port_protocol_list <<< "tcp,udp"
+
 # ip route
 ###
 
@@ -122,9 +125,13 @@ if [[ ! -z "${ADDITIONAL_PORTS}" ]]; then
 
 		echo "[info] Adding additional incoming port ${additional_port_item} for ${docker_interface}"
 
-		# accept input to additional port for "${docker_interface}"
-		iptables -A INPUT -i "${docker_interface}" -p tcp --dport "${additional_port_item}" -j ACCEPT
-		iptables -A INPUT -i "${docker_interface}" -p tcp --sport "${additional_port_item}" -j ACCEPT
+		for additional_port_protocol_item in "${additional_port_protocol_list[@]}"; do
+
+			# accept input to additional port for "${docker_interface}"
+			iptables -A INPUT -i "${docker_interface}" -p "${additional_port_protocol_item}" --dport "${additional_port_item}" -j ACCEPT
+			iptables -A INPUT -i "${docker_interface}" -p "${additional_port_protocol_item}" --sport "${additional_port_item}" -j ACCEPT
+
+		done
 
 	done
 
@@ -216,9 +223,13 @@ if [[ ! -z "${ADDITIONAL_PORTS}" ]]; then
 
 		echo "[info] Adding additional outgoing port ${additional_port_item} for ${docker_interface}"
 
-		# accept output to additional port for lan interface
-		iptables -A OUTPUT -o "${docker_interface}" -p tcp --dport "${additional_port_item}" -j ACCEPT
-		iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport "${additional_port_item}" -j ACCEPT
+		for additional_port_protocol_item in "${additional_port_protocol_list[@]}"; do
+
+			# accept output to additional port for lan interface
+			iptables -A OUTPUT -o "${docker_interface}" -p "${additional_port_protocol_item}" --dport "${additional_port_item}" -j ACCEPT
+			iptables -A OUTPUT -o "${docker_interface}" -p "${additional_port_protocol_item}" --sport "${additional_port_item}" -j ACCEPT
+
+		done
 
 	done
 
