@@ -11,9 +11,6 @@ ADD build/*.conf /etc/supervisor/conf.d/
 ADD build/root/*.sh /root/
 
 # add run bash scripts
-ADD run/root/*.sh /root/
-
-# add run bash scripts
 ADD run/nobody/*.sh /home/nobody/
 
 # add pre-configured config files for nobody
