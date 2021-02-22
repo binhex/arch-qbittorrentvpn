@@ -38,7 +38,7 @@ jobs:
         run: |
           docker build \
             --tag ${{ github.repository }}:${{ github.event.inputs.tags }} \
-            --tag ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}
+            --tag ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }} \
             .
       - name: Push Docker image to Docker Hub
         run: |
