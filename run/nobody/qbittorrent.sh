@@ -5,6 +5,10 @@ if [[ "${qbittorrent_running}" == "false" ]]; then
 	echo "[info] Removing session lock file (if it exists)..."
 	rm -f /config/qBittorrent/data/BT_backup/session.lock
 
+	# set network interface binding to vpn virtual adapter (wg0/tun0/tap0) for qbittorrent on startup
+	sed -i -e "s~^Connection\\\\Interface\=.*~Connection\\\\Interface\=${VPN_DEVICE_TYPE}~g" '/config/qBittorrent/config/qBittorrent.conf'
+	sed -i -e "s~^Connection\\\\InterfaceName\=.*~Connection\\\\InterfaceName\=${VPN_DEVICE_TYPE}~g" '/config/qBittorrent/config/qBittorrent.conf'
+
 	echo "[info] Attempting to start qBittorrent..."
 
 	# run qBittorrent (daemonized, non-blocking) - note qbittorrent requires docker privileged flag
