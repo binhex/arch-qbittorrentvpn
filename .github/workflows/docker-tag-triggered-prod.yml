@@ -12,12 +12,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Update runc (temporary fix) # TODO: Remove step when https://github.com/actions/virtual-environments/issues/2658 fixed
-        run: |
-          sudo apt-get install libseccomp-dev
-          git clone https://github.com/opencontainers/runc
-          cd runc
-          make
-          sudo make install
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          retry_on: error
+          command: |
+            sudo apt-get install libseccomp-dev
+            git clone https://github.com/opencontainers/runc
+            cd runc
+            make
+            sudo make install
       - name: Login to Docker Hub
         uses: docker/login-action@v1 
         with:
@@ -30,29 +36,59 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
       - name: Show Runners environment (debug)
-        shell: bash
-        run: export
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          retry_on: error
+          command: |
+            export
       - name: Identify GitHub tag name
-        shell: bash
-        # get tag name from runners environment 'GITHUB_REF' and then use bash substring
-        # to strip out '+' symbol - required due to gcr not supporting this as a tag 
-        # name (docker hub does support it).
-        # note if push is NOT triggered by tag then 'GITHUB_REF' will be the branch name.
-        run: echo "##[set-output name=tag;]$(tag_name=${GITHUB_REF#refs/tags/} && echo "${tag_name//+/-}")"
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          retry_on: error
+          # get tag name from runners environment 'GITHUB_REF' and then use bash substring
+          # to strip out '+' symbol - required due to gcr not supporting this as a tag 
+          # name (docker hub does support it).
+          # note if push is NOT triggered by tag then 'GITHUB_REF' will be the branch name.
+          command: |
+            echo "##[set-output name=tag;]$(tag_name=${GITHUB_REF#refs/tags/} && echo "${tag_name//+/-}")"
         id: identify_tag
       - name: Build Docker image and tag
-        run: |
-          docker build \
-            --tag ${{ github.repository }}:latest \
-            --tag ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }} \
-            --tag ghcr.io/${{ github.repository }}:latest \
-            --tag ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }} \
-            .
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          retry_on: error
+          command: |
+            docker build \
+              --tag ${{ github.repository }}:latest \
+              --tag ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }} \
+              --tag ghcr.io/${{ github.repository }}:latest \
+              --tag ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }} \
+              .
       - name: Push Docker image to Docker Hub
-        run: |
-          docker push ${{ github.repository }}:latest
-          docker push ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          retry_on: error
+          command: |
+            docker push ${{ github.repository }}:latest
+            docker push ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
       - name: Push Docker image to GitHub Container Registry (GHCR)
-        run: |
-          docker push ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          retry_on: error
+          command: |
+            docker push ghcr.io/${{ github.repository }}:latest
+            docker push ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
