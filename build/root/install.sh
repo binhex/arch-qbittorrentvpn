@@ -24,6 +24,9 @@ fi
 # pacman packages
 ####
 
+# hack - needs rsync for reflector
+pacman -S rsync --noconfirm
+
 # call pacman db and package updater script
 source upd.sh
 
