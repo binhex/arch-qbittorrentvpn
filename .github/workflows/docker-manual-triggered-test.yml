@@ -16,7 +16,7 @@ jobs:
       - name: Update runc (temporary fix) # TODO: Remove step when https://github.com/actions/virtual-environments/issues/2658 fixed
         uses: nick-invision/retry@v2.4.0
         with:
-          timeout_minutes: 60
+          timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 120
           retry_on: error
@@ -40,7 +40,7 @@ jobs:
       - name: Show Runners environment (debug)
         uses: nick-invision/retry@v2.4.0
         with:
-          timeout_minutes: 60
+          timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 120
           retry_on: error
@@ -61,7 +61,7 @@ jobs:
       - name: Push Docker image to Docker Hub
         uses: nick-invision/retry@v2.4.0
         with:
-          timeout_minutes: 60
+          timeout_minutes: 30
           max_attempts: 3
           retry_wait_seconds: 120
           retry_on: error
@@ -70,7 +70,7 @@ jobs:
       - name: Push Docker image to GitHub Container Registry (GHCR)
         uses: nick-invision/retry@v2.4.0
         with:
-          timeout_minutes: 60
+          timeout_minutes: 30
           max_attempts: 3
           retry_wait_seconds: 120
           retry_on: error
