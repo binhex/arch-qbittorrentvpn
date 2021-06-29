@@ -40,7 +40,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }} # NOTE: This MUST be the password NOT the token
-          repository: ${{ github.repository }}Hub
+          repository: ${{ github.repository }}
           short-description: ${{ github.event.repository.description }}
       - name: DEBUG Show Runners environment
         uses: nick-invision/retry@v2.4.0
