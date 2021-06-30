@@ -1,0 +1,40 @@
+version: '3.1'
+
+# Please read READMME.md to learn how to properly configure these values
+
+services:
+  qbittorrentvpn:
+    container_name: qbittorrentvpn
+    image: binhex/arch-qbittorrentvpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+      - 8080:8080
+      - 8118:8118
+    volumes:
+      # Replace paths with desired values, defaults to current directory
+      - ./data:/data
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      # Change to yes if using a VPN
+      - VPN_ENABLED=no
+      # If using a VPN, uncomment and fill in correct information, read README.md
+#      - VPN_USER=myusername
+#      - VPN_PASS=mypassword
+#      - VPN_PROV=<pia|airvpn|custom>
+#      - VPN_CLIENT=<openvpn|wireguard>
+#      - VPN_OPTIONS=<additional openvpn cli options>
+#      - STRICT_PORT_FORWARD=<yes|no>
+#      - VPN_INPUT_PORTS=<port number(s)>
+#      - VPN_OUTPUT_PORTS=<port number(s)>
+      - LAN_NETWORK=<lan ipv4 network>/<cidr notation>
+      - NAME_SERVERS=<name server ip(s)>
+      - ENABLE_PRIVOXY=<yes|no>
+      - DEBUG=<true|false>
+      - WEBUI_PORT=8080
+      - UMASK=000
+      - PUID=0
+      - PGID=0
