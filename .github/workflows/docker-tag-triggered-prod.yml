@@ -17,7 +17,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             sudo apt-get install libseccomp-dev
             git clone https://github.com/opencontainers/runc
@@ -48,7 +47,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             export
       - name: Identify GitHub tag name
@@ -61,7 +59,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             echo "##[set-output name=tag;]$(tag_name=${GITHUB_REF#refs/tags/} && echo "${tag_name//+/-}")"
         id: identify_tag
@@ -71,7 +68,6 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             docker build \
               --tag ${{ github.repository }}:latest \
@@ -85,7 +81,6 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             docker images
       - name: Push Docker image to Docker Hub
@@ -94,7 +89,6 @@ jobs:
           timeout_minutes: 30
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             docker push ${{ github.repository }}:latest
             docker push ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
@@ -104,7 +98,6 @@ jobs:
           timeout_minutes: 30
           max_attempts: 3
           retry_wait_seconds: 120
-          retry_on: error
           command: |
             docker push ghcr.io/${{ github.repository }}:latest
             docker push ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
