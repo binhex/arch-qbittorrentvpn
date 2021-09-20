@@ -43,7 +43,7 @@ jobs:
               --tag ${{ github.repository }}:${{ github.event.inputs.tags }} \
               --tag ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }} \
               .
-      - name: Run Smoke Tests
+      - name: Run Tests
         shell: bash
         run: |
           git_clone_scripts_dest="/tmp/scripts"
