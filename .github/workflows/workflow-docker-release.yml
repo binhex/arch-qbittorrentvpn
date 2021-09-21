@@ -78,7 +78,7 @@ jobs:
           git_clone_scripts_repo="https://github.com/binhex/scripts.git"
 
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
-          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --image-name "ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}" --host-port '9999' --container-port '8118' --network-type 'bridge' --env-vars '-e VPN_ENABLED=no'
+          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --image-name "ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}" --container-ports '-p 9999:8118' --network-type 'bridge' --env-vars '-e VPN_ENABLED=no'
       - name: Push Docker image to Docker Hub
         uses: nick-invision/retry@v2.4.0
         with:
