@@ -37,7 +37,7 @@ jobs:
           retry_wait_seconds: 120
           command: |
             export
-      - name: Identify GitHub tag name
+      - name: Identify GitHub Release tag name
         # get tag name from runners environment 'GITHUB_REF' and then use bash substring
         # to strip out '+' symbol - required due to gcr not supporting this as a tag
         # name (docker hub does support it).
@@ -49,7 +49,14 @@ jobs:
           retry_wait_seconds: 120
           command: |
             echo "##[set-output name=tag;]$(tag_name=${GITHUB_REF#refs/tags/} && echo "${tag_name//+/-}")"
-        id: identify_tag
+        id: identify_github_release_tag_name
+      - name: Generate temporary tag name
+        shell: bash
+        run: |
+          test_tag=$(date +%Y%m%d%H%M%S)
+          echo "[debug] Generated test tag name is '${test_tag}'"
+          echo "::set-output name=test_tag::$test_tag"
+        id: generate_temporary_tag_name
       - name: Build Docker image and tag
         uses: nick-invision/retry@v2.4.0
         with:
@@ -58,10 +65,12 @@ jobs:
           retry_wait_seconds: 120
           command: |
             docker build \
+              --tag ${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ${{ github.repository }}:latest \
-              --tag ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }} \
+              --tag ${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }} \
+              --tag ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ghcr.io/${{ github.repository }}:latest \
-              --tag ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }} \
+              --tag ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }} \
               .
       - name: DEBUG Show built Docker Images
         uses: nick-invision/retry@v2.4.0
@@ -76,9 +85,10 @@ jobs:
         run: |
           git_clone_scripts_dest="/tmp/scripts"
           git_clone_scripts_repo="https://github.com/binhex/scripts.git"
+          container_port="8118"
 
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
-          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --image-name "ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}" --container-ports '-p 9999:8118' --network-type 'bridge' --env-vars '-e VPN_ENABLED=no'
+          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}" --container-ports "-p 9999:${container_port}" --network-type 'bridge'
       - name: Push Docker image to Docker Hub
         uses: nick-invision/retry@v2.4.0
         with:
@@ -87,7 +97,7 @@ jobs:
           retry_wait_seconds: 120
           command: |
             docker push ${{ github.repository }}:latest
-            docker push ${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
+            docker push ${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
       - name: Push Docker image to GitHub Container Registry (GHCR)
         uses: nick-invision/retry@v2.4.0
         with:
@@ -96,4 +106,4 @@ jobs:
           retry_wait_seconds: 120
           command: |
             docker push ghcr.io/${{ github.repository }}:latest
-            docker push ghcr.io/${{ github.repository }}:${{ steps.identify_tag.outputs.tag }}
+            docker push ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}

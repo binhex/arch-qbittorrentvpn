@@ -32,6 +32,13 @@ jobs:
           retry_wait_seconds: 120
           command: |
             export
+      - name: Generate temporary tag name
+        shell: bash
+        run: |
+          test_tag=$(date +%Y%m%d%H%M%S)
+          echo "[debug] Generated test tag name is '${test_tag}'"
+          echo "::set-output name=test_tag::$test_tag"
+        id: generate_temporary_tag_name
       - name: Build Docker image and tag
         uses: nick-invision/retry@v2.4.0
         with:
@@ -40,7 +47,9 @@ jobs:
           retry_wait_seconds: 120
           command: |
             docker build \
+              --tag ${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ${{ github.repository }}:${{ github.event.inputs.tags }} \
+              --tag ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }} \
               .
       - name: Run Tests
@@ -48,9 +57,10 @@ jobs:
         run: |
           git_clone_scripts_dest="/tmp/scripts"
           git_clone_scripts_repo="https://github.com/binhex/scripts.git"
+          container_port="8118"
 
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
-          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --image-name "ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}" --container-ports '-p 9999:8118' --network-type 'bridge' --env-vars '-e VPN_ENABLED=no'
+          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}" --container-ports "-p 9999:${container_port}" --network-type 'bridge'
       - name: Push Docker image to Docker Hub
         uses: nick-invision/retry@v2.4.0
         with:
