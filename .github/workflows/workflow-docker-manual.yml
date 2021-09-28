@@ -59,7 +59,7 @@ jobs:
           git_clone_scripts_repo="https://github.com/binhex/scripts.git"
 
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
-          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name 'airsonic' --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
+          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name 'qbittorrent' --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
       - name: Push Docker image to Docker Hub
         uses: nick-invision/retry@v2.4.0
         with:
