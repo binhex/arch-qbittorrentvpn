@@ -39,6 +39,13 @@ jobs:
           echo "[debug] Generated test tag name is '${test_tag}'"
           echo "::set-output name=test_tag::$test_tag"
         id: generate_temporary_tag_name
+      - name: Generate app name
+        shell: bash
+        run: |
+          app_name=$(echo "${GITHUB_REPOSITORY}" | grep -P -o -m 1 '(?<=/arch-).*')
+          echo "[debug] Generated app name is '${app_name}'"
+          echo "::set-output name=app_name::$app_name"
+        id: generate_app_name
       - name: Build Docker image and tag
         uses: nick-invision/retry@v2.4.0
         with:
@@ -59,7 +66,7 @@ jobs:
           git_clone_scripts_repo="https://github.com/binhex/scripts.git"
 
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
-          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name 'qbittorrent' --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
+          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
       - name: Push Docker image to Docker Hub
         uses: nick-invision/retry@v2.4.0
         with:
