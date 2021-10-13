@@ -78,6 +78,7 @@ jobs:
               --tag ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ghcr.io/${{ github.repository }}:latest \
               --tag ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }} \
+              --build-arg release_tag_name=${{ steps.identify_github_release_tag_name.outputs.tag }} \
               .
       - name: DEBUG Show built Docker Images
         uses: nick-invision/retry@v2.4.0
