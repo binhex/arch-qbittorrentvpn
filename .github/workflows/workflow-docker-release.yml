@@ -16,12 +16,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Login to GitHub Container Registry (GHCR)
+      - name: Login to GitHub
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
+      - name: Login to GitLab
+        uses: docker/login-action@v1
+        with:
+          registry: registry.gitlab.com
+          username: ${{ secrets.GITLAB_USERNAME }}
+          password: ${{ secrets.GITLAB_TOKEN }}
       - name: Sync GitHub README.md with Docker Hub
         uses: peter-evans/dockerhub-description@v2
         with:
@@ -78,6 +84,9 @@ jobs:
               --tag ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ghcr.io/${{ github.repository }}:latest \
               --tag ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }} \
+              --tag registry.gitlab.com/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
+              --tag registry.gitlab.com/${{ github.repository }}:latest \
+              --tag registry.gitlab.com/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }} \
               --build-arg release_tag_name=${{ steps.identify_github_release_tag_name.outputs.tag }} \
               .
       - name: DEBUG Show built Docker Images
@@ -114,3 +123,12 @@ jobs:
           command: |
             docker push ghcr.io/${{ github.repository }}:latest
             docker push ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
+      - name: Push Docker image to GitLab Container Registry (GCR)
+        uses: nick-invision/retry@v2.4.0
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_wait_seconds: 120
+          command: |
+            docker push registry.gitlab.com/${{ github.repository }}:latest
+            docker push registry.gitlab.com/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
