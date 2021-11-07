@@ -177,7 +177,6 @@ Other users - Please download your WireGuard configuration file from your VPN pr
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
-209.222.x.x = PIA
 84.200.x.x = DNS Watch
 37.235.x.x = FreeDNS
 1.x.x.x = Cloudflare
