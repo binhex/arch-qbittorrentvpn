@@ -152,6 +152,10 @@ PIA users - The URL to download the OpenVPN configuration files and certs is:-
 
 https://www.privateinternetaccess.com/openvpn/openvpn.zip
 
+NordVPN users - The URL to download the OpenVPN configuration files and certs is:-
+
+https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip
+
 Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
 
 If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
