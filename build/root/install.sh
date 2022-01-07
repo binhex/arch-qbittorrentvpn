@@ -58,8 +58,8 @@ source aur.sh
 # object file: No such file or directory.' when running this container on
 # hosts with older kernels (centos, mac os). alternative workaround to this
 # is for the user to upgrade the kernel on their host.
-pacman -S binutils --needed --noconfirm
-strip --remove-section=.note.ABI-tag /usr/lib64/libQt5Core.so.5
+#pacman -S binutils --needed --noconfirm
+#strip --remove-section=.note.ABI-tag /usr/lib64/libQt5Core.so.5
 
 # container perms
 ####
