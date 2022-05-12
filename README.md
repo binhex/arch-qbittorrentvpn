@@ -109,8 +109,9 @@ AirVPN users will also need to create a port forward by using the following link
 
 qBittorrent example config
 ```
-port_range = 49400-49400
-port_random = no
+[BitTorrent]
+...
+Session\Port=49400
 ```
 &nbsp;
 **AirVPN example**
