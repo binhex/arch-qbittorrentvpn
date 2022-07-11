@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 if [[ "${qbittorrent_running}" == "false" ]]; then
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 # define destination file path for qbittorrent config file
 qbittorrent_config="/config/qBittorrent/config/qBittorrent.conf"
