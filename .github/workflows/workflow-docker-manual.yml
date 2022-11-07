@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.GITLAB_USERNAME }}
           password: ${{ secrets.GITLAB_TOKEN }}
       - name: Show Runners environment (debug)
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -53,7 +53,7 @@ jobs:
           echo "::set-output name=app_name::$app_name"
         id: generate_app_name
       - name: Build Docker image and tag
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
           max_attempts: 3
@@ -76,7 +76,7 @@ jobs:
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
           "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
       - name: Push Docker image to Docker Hub
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 3
@@ -84,7 +84,7 @@ jobs:
           command: |
             docker push ${{ github.repository }}:${{ github.event.inputs.tags }}
       - name: Push Docker image to GitHub Container Registry (GHCR)
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 3
@@ -92,7 +92,7 @@ jobs:
           command: |
             docker push ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}
       - name: Push Docker image to GitLab Container Registry (GCR)
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 3

@@ -36,7 +36,7 @@ jobs:
           repository: ${{ github.repository }}
           short-description: ${{ github.event.repository.description }}
       - name: DEBUG Show Runners environment
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -48,7 +48,7 @@ jobs:
         # to strip out '+' symbol - required due to gcr not supporting this as a tag
         # name (docker hub does support it).
         # note if push is NOT triggered by tag then 'GITHUB_REF' will be the branch name.
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -71,7 +71,7 @@ jobs:
           echo "::set-output name=app_name::$app_name"
         id: generate_app_name
       - name: Build Docker image and tag
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
           max_attempts: 3
@@ -90,7 +90,7 @@ jobs:
               --build-arg release_tag_name=${{ steps.identify_github_release_tag_name.outputs.tag }} \
               .
       - name: DEBUG Show built Docker Images
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -106,7 +106,7 @@ jobs:
           git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
           "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
       - name: Push Docker image to Docker Hub
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 3
@@ -115,7 +115,7 @@ jobs:
             docker push ${{ github.repository }}:latest
             docker push ${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
       - name: Push Docker image to GitHub Container Registry (GHCR)
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 3
@@ -124,7 +124,7 @@ jobs:
             docker push ghcr.io/${{ github.repository }}:latest
             docker push ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
       - name: Push Docker image to GitLab Container Registry (GCR)
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-fields/retry@v2
         with:
           timeout_minutes: 30
           max_attempts: 3
