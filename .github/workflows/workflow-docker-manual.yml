@@ -43,14 +43,14 @@ jobs:
         run: |
           test_tag=$(date +%Y%m%d%H%M%S)
           echo "[debug] Generated test tag name is '${test_tag}'"
-          echo "::echo "test_tag=$test_tag" >> $GITHUB_OUTPUT"
+          echo "test_tag=$test_tag" >> $GITHUB_OUTPUT
         id: generate_temporary_tag_name
       - name: Generate app name
         shell: bash
         run: |
           app_name=$(echo "${GITHUB_REPOSITORY}" | grep -P -o -m 1 '(?<=/arch-).*')
           echo "[debug] Generated app name is '${app_name}'"
-          echo "::set-output name=app_name::$app_name"
+          echo "app_name=$app_name" >> $GITHUB_OUTPUT
         id: generate_app_name
       - name: Build Docker image and tag
         uses: nick-fields/retry@v2
