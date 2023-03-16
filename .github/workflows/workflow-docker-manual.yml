@@ -24,6 +24,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
+      - name: Login to Quay
+        uses: docker/login-action@v2
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
       - name: Login to GitLab
         uses: docker/login-action@v2
         with:
@@ -62,6 +68,8 @@ jobs:
             docker build \
               --tag ${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ${{ github.repository }}:${{ github.event.inputs.tags }} \
+              --tag quay.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
+              --tag quay.io/${{ github.repository }}:${{ github.event.inputs.tags }} \
               --tag ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
               --tag ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }} \
               --tag registry.gitlab.com/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }} \
@@ -83,6 +91,14 @@ jobs:
           retry_wait_seconds: 120
           command: |
             docker push ${{ github.repository }}:${{ github.event.inputs.tags }}
+      - name: Push Docker image to Quay Container Registry
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_wait_seconds: 120
+          command: |
+            docker push quay.io/${{ github.repository }}:${{ github.event.inputs.tags }}
       - name: Push Docker image to GitHub Container Registry (GHCR)
         uses: nick-fields/retry@v2
         with:
