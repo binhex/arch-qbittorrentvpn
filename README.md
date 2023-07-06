@@ -33,7 +33,7 @@ docker run -d \
     -e VPN_ENABLED=<yes|no> \
     -e VPN_USER=<vpn username> \
     -e VPN_PASS=<vpn password> \
-    -e VPN_PROV=<pia|airvpn|custom> \
+    -e VPN_PROV=<pia|airvpn|protonvpn|custom> \
     -e VPN_CLIENT=<openvpn|wireguard> \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRICT_PORT_FORWARD=<yes|no> \
