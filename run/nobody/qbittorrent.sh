@@ -60,7 +60,7 @@ fi
 
 # change incoming port using the qbittorrent api - note this requires anonymous authentication via webui
 # option 'Bypass authentication for clients on localhost'
-if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
+if [[ "${VPN_PROV}" == "pia" ||  "${VPN_PROV}" == "protonvpn" ]] && [[ -n "${VPN_INCOMING_PORT}" ]]; then
 
 	# identify protocol, used by curl to connect to api
 	if grep -q 'WebUI\\HTTPS\\Enabled=true' '/config/qBittorrent/config/qBittorrent.conf'; then

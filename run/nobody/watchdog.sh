@@ -97,7 +97,7 @@ while true; do
 
 			fi
 
-			if [[ "${VPN_PROV}" == "pia" ]]; then
+			if [[ "${VPN_PROV}" == "pia" || "${VPN_PROV}" == "protonvpn" ]]; then
 
 				# if vpn port is not an integer then dont change port
 				if [[ ! "${VPN_INCOMING_PORT}" =~ ^-?[0-9]+$ ]]; then
@@ -191,7 +191,7 @@ while true; do
 
 	if [[ "${DEBUG}" == "true" && "${VPN_ENABLED}" == "yes" ]]; then
 
-		if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
+		if [[ "${VPN_PROV}" == "pia" || "${VPN_PROV}" == "protonvpn" ]] && [[ -n "${VPN_INCOMING_PORT}" ]]; then
 
 			echo "[debug] VPN incoming port is ${VPN_INCOMING_PORT}"
 			echo "[debug] qBittorrent incoming port is ${qbittorrent_port}"
