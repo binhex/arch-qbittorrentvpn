@@ -1,15 +1,16 @@
-FROM binhex/arch-int-vpn:latest
+FROM binhex/arch-int-vpn::latest
 LABEL org.opencontainers.image.authors = "binhex"
 LABEL org.opencontainers.image.source = "https://github.com/binhex/arch-qbittorrentvpn"
 
+ARG TARGETARCH
 # additional files
 ##################
 
 # add supervisor conf file for app
-ADD build/*.conf /etc/supervisor/conf.d/
+ADD ${TARGETARCH}/build/*.conf /etc/supervisor/conf.d/
 
 # add bash scripts to install app
-ADD build/root/*.sh /root/
+ADD ${TARGETARCH}/build/root/*.sh /root/
 
 # get release tag name from build arg
 ARG release_tag_name
