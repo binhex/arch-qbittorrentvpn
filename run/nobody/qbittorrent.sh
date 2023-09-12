@@ -8,6 +8,8 @@ if [[ "${qbittorrent_running}" == "false" ]]; then
 	# set network interface binding to vpn virtual adapter (wg0/tun0/tap0) for qbittorrent on startup
 	sed -i -e "s~^Connection\\\\Interface\=.*~Connection\\\\Interface\=${VPN_DEVICE_TYPE}~g" '/config/qBittorrent/config/qBittorrent.conf'
 	sed -i -e "s~^Connection\\\\InterfaceName\=.*~Connection\\\\InterfaceName\=${VPN_DEVICE_TYPE}~g" '/config/qBittorrent/config/qBittorrent.conf'
+	sed -i -e "s~^Session\\\\Interface\=.*~Session\\\\Interface\=${VPN_DEVICE_TYPE}~g" '/config/qBittorrent/config/qBittorrent.conf'
+	sed -i -e "s~^Session\\\\InterfaceName\=.*~Session\\\\InterfaceName\=${VPN_DEVICE_TYPE}~g" '/config/qBittorrent/config/qBittorrent.conf'
 
 	echo "[info] Attempting to start qBittorrent..."
 
