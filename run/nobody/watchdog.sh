@@ -26,6 +26,9 @@ rm -f /config/qBittorrent/data/BT_backup/session.lock
 # set locale to prevent 4.1.4 gui render issues if no locale set
 grep -q 'General\\Locale' "${qbittorrent_config}" || sed -i '/\[Preferences\]/a General\\Locale=en' "${qbittorrent_config}"
 
+# forcibly set allow anonymous access from localhost to api (used to change incoming port)
+sed -i 's~^WebUI\\LocalHostAuth=.*~WebUI\\LocalHostAuth=false~g' "${qbittorrent_config}"
+
 # set default values for port and ip
 qbittorrent_port="6881"
 qbittorrent_ip="0.0.0.0"
@@ -49,9 +52,6 @@ while true; do
 	qbittorrent_port_change="false"
 
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
-
-		# forcibly set allow anonymous access from localhost to api (used to change incoming port)
-		sed -i 's~^WebUI\\LocalHostAuth=.*~WebUI\\LocalHostAuth=false~g' "${qbittorrent_config}"
 
 		# run script to get all required info
 		source /home/nobody/preruncheck.sh
