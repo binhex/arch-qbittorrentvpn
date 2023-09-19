@@ -104,4 +104,4 @@ jobs:
           push: true
           tags: ${{ github.repository }}:latest, ${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, quay.io/${{ github.repository }}:latest, quay.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, registry.gitlab.com/${{ github.repository }}:latest, registry.gitlab.com/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
           build-args: |
-            release_tag_name=${{ steps.identify_github_release_tag_name.outputs.tag }}
+            RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.tag }}
