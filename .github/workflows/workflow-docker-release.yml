@@ -65,6 +65,8 @@ jobs:
           retry_wait_seconds: 120
           command: |
             tag="${GITHUB_REF_NAME}" && echo "tag=${tag//+/-}" >> $GITHUB_OUTPUT
+            echo "[debug] Generated tag name is '${tag}'"
+            echo "tag=$tag" >> $GITHUB_OUTPUT
         id: identify_github_release_tag_name
       - name: Generate temporary tag name
         shell: bash
