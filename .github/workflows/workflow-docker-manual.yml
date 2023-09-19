@@ -40,7 +40,14 @@ jobs:
           registry: registry.gitlab.com
           username: ${{ secrets.GITLAB_USERNAME }}
           password: ${{ secrets.GITLAB_TOKEN }}
-      - name: Show Runners environment (debug)
+      - name: Sync GitHub README.md with Docker Hub
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }} # NOTE: This MUST be the password NOT the token
+          repository: ${{ github.repository }}
+          short-description: ${{ github.event.repository.description }}
+      - name: DEBUG Show Runners environment
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
@@ -83,3 +90,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ github.repository }}:${{ github.event.inputs.tags }}, quay.io/${{ github.repository }}:${{ github.event.inputs.tags }}, ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}, registry.gitlab.com/${{ github.repository }}:${{ github.event.inputs.tags }}
+          build-args: |
+            release_tag_name=${{ steps.identify_github_release_tag_name.outputs.tag }}
