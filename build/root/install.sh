@@ -8,30 +8,14 @@ release_tag_name="${1//-[0-9][0-9]/}"
 
 # note do NOT download build scripts - inherited from int script with envvars common defined
 
-# detect image arch
-####
-
-OS_ARCH=$(cat /etc/os-release | grep -P -o -m 1 "(?=^ID\=).*" | grep -P -o -m 1 "[a-z]+$")
-if [[ ! -z "${OS_ARCH}" ]]; then
-	if [[ "${OS_ARCH}" == "arch" ]]; then
-		OS_ARCH="x86-64"
-	else
-		OS_ARCH="aarch64"
-	fi
-	echo "[info] OS_ARCH defined as '${OS_ARCH}'"
-else
-	echo "[warn] Unable to identify OS_ARCH, defaulting to 'x86-64'"
-	OS_ARCH="x86-64"
-fi
+# get target arch from Dockerfile argument
+TARGETARCH="${2}"
 
 # pacman packages
 ####
 
-# hack - needs rsync for reflector
-pacman -S rsync --noconfirm
-
 # call pacman db and package updater script
-source upd.sh
+source upd.sh "${TARGETARCH}"
 
 # define pacman packages
 pacman_packages="qbittorrent-nox python geoip"

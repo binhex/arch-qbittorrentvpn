@@ -2,6 +2,8 @@ FROM binhex/arch-int-vpn:latest
 LABEL org.opencontainers.image.authors = "binhex"
 LABEL org.opencontainers.image.source = "https://github.com/binhex/arch-qbittorrentvpn"
 
+ARG TARGETARCH
+
 # additional files
 ##################
 
@@ -25,7 +27,7 @@ ADD config/nobody/ /home/nobody/
 
 # make executable and run bash scripts to install app
 RUN chmod +x /root/*.sh /home/nobody/*.sh && \
-	/bin/bash /root/install.sh "${release_tag_name}"
+	/bin/bash /root/install.sh "${release_tag_name}" "${TARGETARCH}"
 
 # docker settings
 #################
