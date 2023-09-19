@@ -15,7 +15,7 @@ TARGETARCH="${2}"
 ####
 
 # call pacman db and package updater script
-source upd.sh "${TARGETARCH}"
+source upd.sh
 
 # define pacman packages
 pacman_packages="qbittorrent-nox python geoip"
