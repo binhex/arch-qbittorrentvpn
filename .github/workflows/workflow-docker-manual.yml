@@ -75,6 +75,8 @@ jobs:
           context: .
           load: true
           tags: ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
+          build-args: |
+            RELEASETAG=${{ github.event.inputs.tags }}
       - name: Run tests using previously built image
         shell: bash
         run: |
