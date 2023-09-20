@@ -2,6 +2,12 @@ FROM binhex/arch-int-vpn:latest
 LABEL org.opencontainers.image.authors = "binhex"
 LABEL org.opencontainers.image.source = "https://github.com/binhex/arch-qbittorrentvpn"
 
+# release tag name from buildx arg
+ARG RELEASETAG
+
+# arch from buildx --platform, e.g. amd64
+ARG TARGETARCH
+
 # additional files
 ##################
 
@@ -10,12 +16,6 @@ ADD build/*.conf /etc/supervisor/conf.d/
 
 # add bash scripts to install app
 ADD build/root/*.sh /root/
-
-# release tag name from buildx arg
-ARG RELEASETAG
-
-# arch from buildx --platform, e.g. amd64
-ARG TARGETARCH
 
 # add run bash scripts
 ADD run/nobody/*.sh /home/nobody/
