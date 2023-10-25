@@ -1,4 +1,4 @@
-FROM binhex/arch-int-vpn:latest
+FROM binhex/arch-int-vpn:multi_adapter
 LABEL org.opencontainers.image.authors = "binhex"
 LABEL org.opencontainers.image.source = "https://github.com/binhex/arch-qbittorrentvpn"
 
