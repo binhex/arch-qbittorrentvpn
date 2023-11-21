@@ -31,7 +31,7 @@ TARGETARCH="${2}"
 source upd.sh
 
 # define pacman packages
-pacman_packages="qbittorrent-nox python geoip"
+pacman_packages="python geoip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -42,7 +42,7 @@ fi
 ####
 
 # define aur packages
-aur_packages=""
+aur_packages="libtorrent-rasterbar-1"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source aur.sh
@@ -50,13 +50,22 @@ source aur.sh
 # custom
 ####
 
-# this is a (temporary?) hack to prevent the error '/usr/bin/qbittorrent-nox:
-# error while loading shared libraries: libQt5Core.so.5: cannot open shared
-# object file: No such file or directory.' when running this container on
-# hosts with older kernels (centos, mac os). alternative workaround to this
-# is for the user to upgrade the kernel on their host.
-#pacman -S binutils --needed --noconfirm
-#strip --remove-section=.note.ABI-tag /usr/lib64/libQt5Core.so.5
+# building package due to libtorrent-rasterbar v2 being included with aor package
+
+# download PKGBUILD from aor
+cd /tmp && curl -L -o PKGBUILD https://raw.githubusercontent.com/archlinux/svntogit-community/packages/qbittorrent/trunk/PKGBUILD
+
+# edit package to use libtorrent-rasterbar-1 (installed earlier via aur.sh)
+sed -i -e 's~^depends=(libtorrent-rasterbar qt6-base)~depends=(libtorrent-rasterbar-1 qt6-base)~g' './PKGBUILD'
+
+# strip out restriction to not allow make as user root, used during make of aur helper
+sed -i -e 's~exit $E_ROOT~~g' "/usr/bin/makepkg"
+
+# build package
+makepkg --ignorearc --clean --syncdeps --skippgpcheck --noconfirm
+
+# install package
+pacman -U qbittorrent-nox*.tar.zst --noconfirm
 
 # container perms
 ####
