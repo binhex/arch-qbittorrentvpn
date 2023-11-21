@@ -42,6 +42,7 @@ fi
 ####
 
 # define aur packages
+# note if we change this package name then ensure we also edit the PKGBUILD hack to match (see custom)
 aur_packages="libtorrent-rasterbar-1"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
@@ -50,13 +51,13 @@ source aur.sh
 # custom
 ####
 
-# building package due to libtorrent-rasterbar v2 being included with aor package
+# building qbittorrent-nox package due to libtorrent-rasterbar v2 being included with aor package
 
-# download PKGBUILD from aor
-cd /tmp && curl -L -o PKGBUILD https://raw.githubusercontent.com/archlinux/svntogit-community/packages/qbittorrent/trunk/PKGBUILD
+# download PKGBUILD from aor package 'Source Files' (gitlab)
+cd /tmp && curl -o PKGBUILD -L https://gitlab.archlinux.org/archlinux/packaging/packages/qbittorrent/-/raw/main/PKGBUILD
 
 # edit package to use libtorrent-rasterbar-1 (installed earlier via aur.sh)
-sed -i -e 's~^depends=(libtorrent-rasterbar qt6-base)~depends=(libtorrent-rasterbar-1 qt6-base)~g' './PKGBUILD'
+sed -i -e "s~libtorrent-rasterbar~${aur_packages}~g" './PKGBUILD'
 
 # strip out restriction to not allow make as user root, used during make of aur helper
 sed -i -e 's~exit $E_ROOT~~g' "/usr/bin/makepkg"
