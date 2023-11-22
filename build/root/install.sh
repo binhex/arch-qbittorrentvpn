@@ -57,7 +57,7 @@ source aur.sh
 cd /tmp && curl -o PKGBUILD -L https://gitlab.archlinux.org/archlinux/packaging/packages/qbittorrent/-/raw/main/PKGBUILD
 
 # edit package to use libtorrent-rasterbar-1 (installed earlier via aur.sh)
-sed -i -e "s~libtorrent-rasterbar~libtorrent-rasterbar-1~g" './PKGBUILD'
+#sed -i -e "s~libtorrent-rasterbar~libtorrent-rasterbar-1~g" './PKGBUILD'
 
 # strip out restriction to not allow make as user root, used during make of aur helper
 sed -i -e 's~exit $E_ROOT~~g' "/usr/bin/makepkg"
