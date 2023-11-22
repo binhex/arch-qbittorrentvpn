@@ -21,14 +21,25 @@ fi
 
 # note do NOT download build scripts - inherited from int script with envvars common defined
 
-# get target arch from Dockerfile argument
-TARGETARCH="${2}"
+# aur packages
+####
+
+# define aur packages
+# note we are currently using the aur package ' libtorrent-rasterbar-1_2-git' as opposed to
+# the stable aur package 'libtorrent-rasterbar-1' because we require 'python-bindings=ON',
+# failure to enable python-bindings will result in deluge reporting
+# 'ModuleNotFoundError: No module named 'libtorrent''
+aur_packages="libtorrent-rasterbar-1_2-git"
+
+# call aur install script (arch user repo)
+source aur.sh
+
+# ignore aor package 'libtorrent-rasterbar' to prevent upgrade to libtorrent v2 as libtorrent
+# v2 causes numerous issues, including crashing on unraid due to kernel bug
+sed -i -e 's~IgnorePkg.*~IgnorePkg = filesystem libtorrent-rasterbar~g' '/etc/pacman.conf'
 
 # pacman packages
 ####
-
-# call pacman db and package updater script
-source upd.sh
 
 # define pacman packages
 pacman_packages="python geoip"
@@ -38,16 +49,6 @@ if [[ ! -z "${pacman_packages}" ]]; then
 	pacman -S --needed $pacman_packages --noconfirm
 fi
 
-# aur packages
-####
-
-# define aur packages
-# note if we change this package name then ensure we also edit the PKGBUILD hack to match (see custom)
-aur_packages="libtorrent-rasterbar-1_2-git"
-
-# call aur install script (arch user repo) - note true required due to autodl-irssi error during install
-source aur.sh
-
 # custom
 ####
 
@@ -56,10 +57,7 @@ source aur.sh
 # download PKGBUILD from aor package 'Source Files' (gitlab)
 cd /tmp && curl -o PKGBUILD -L https://gitlab.archlinux.org/archlinux/packaging/packages/qbittorrent/-/raw/main/PKGBUILD
 
-# edit package to use libtorrent-rasterbar-1 (installed earlier via aur.sh)
-#sed -i -e "s~libtorrent-rasterbar~libtorrent-rasterbar-1~g" './PKGBUILD'
-
-# strip out restriction to not allow make as user root, used during make of aur helper
+# strip out restriction to not allow make as user root (docker build uses root)
 sed -i -e 's~exit $E_ROOT~~g' "/usr/bin/makepkg"
 
 # build package
