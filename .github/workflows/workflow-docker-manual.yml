@@ -69,12 +69,16 @@ jobs:
           echo "[debug] Generated app name is '${app_name}'"
           echo "app_name=$app_name" >> $GITHUB_OUTPUT
         id: generate_app_name
+      - id: lower-repo
+        shell: pwsh
+        run: |
+          "::set-output name=repository::$($env:GITHUB_REPOSITORY.ToLowerInvariant())"
       - name: Build amd64 image and export to Docker for testing
         uses: docker/build-push-action@v5
         with:
           context: .
           load: true
-          tags: ghcr.io/${{ github.repository@L }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
+          tags: ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
           build-args: |
             RELEASETAG=${{ github.event.inputs.tags }}
       - name: Run tests using previously built image
