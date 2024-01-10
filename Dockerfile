@@ -1,6 +1,6 @@
 FROM binhex/arch-int-vpn:latest
-LABEL org.opencontainers.image.authors = "binhex"
-LABEL org.opencontainers.image.source = "https://github.com/binhex/arch-qbittorrentvpn"
+LABEL org.opencontainers.image.authors = "CanardConfit"
+LABEL org.opencontainers.image.source = "https://github.com/CanardConfit/arch-qbittorrentvpn"
 
 # release tag name from buildx arg
 ARG RELEASETAG
@@ -36,8 +36,8 @@ RUN chmod +x /root/*.sh /home/nobody/*.sh && \
 # expose port for incoming connections (used only if vpn disabled)
 EXPOSE 6881
 
-# expose port for qbittorrent http
-EXPOSE 8080
+# expose port for iqbit http
+EXPOSE 8081
 
 # expose port for privoxy
 EXPOSE 8118

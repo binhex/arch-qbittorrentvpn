@@ -75,10 +75,13 @@ if [[ "${VPN_PROV}" == "pia" ||  "${VPN_PROV}" == "protonvpn" ]] && [[ -n "${VPN
 	curl -k -i -X POST -d "json={\"random_port\": false}" "${web_protocol}://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
 	curl -k -i -X POST -d "json={\"listen_port\": ${VPN_INCOMING_PORT}}" "${web_protocol}://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
 
-	# set qbittorrent port to current vpn port (used when checking for changes on next run)s
+	# set qbittorrent port to current vpn port (used when checking for changes on next run)
 	qbittorrent_port="${VPN_INCOMING_PORT}"
 
 fi
 
 # set qbittorrent ip to current vpn ip (used when checking for changes on next run)
 qbittorrent_ip="${vpn_ip}"
+
+# Run iqbit frontend
+source /home/nobody/iqbit.sh

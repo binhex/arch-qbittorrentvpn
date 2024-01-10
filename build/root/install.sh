@@ -31,7 +31,7 @@ TARGETARCH="${2}"
 source upd.sh
 
 # define pacman packages
-pacman_packages="qbittorrent-nox python geoip"
+pacman_packages="qbittorrent-nox python geoip git nodejs npm yarn"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -118,12 +118,14 @@ rm /tmp/permissions_heredoc
 
 cat <<'EOF' > /tmp/envvars_heredoc
 
-export WEBUI_PORT=$(echo "${WEBUI_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-if [[ ! -z "${WEBUI_PORT}" ]]; then
-	echo "[info] WEBUI_PORT defined as '${WEBUI_PORT}'" | ts '%Y-%m-%d %H:%M:%.S'
+export WEBUI_PORT=8080
+
+export WEBUI_IQBIT_PORT=$(echo "${WEBUI_IQBIT_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${WEBUI_IQBIT_PORT}" ]]; then
+	echo "[info] WEBUI_PORT defined as '${WEBUI_IQBIT_PORT}'" | ts '%Y-%m-%d %H:%M:%.S'
 else
-	echo "[warn] WEBUI_PORT not defined (via -e WEBUI_PORT), defaulting to '8080'" | ts '%Y-%m-%d %H:%M:%.S'
-	export WEBUI_PORT="8080"
+	echo "[warn] WEBUI_IQBIT_PORT not defined (via -e WEBUI_IQBIT_PORT), defaulting to '8081'" | ts '%Y-%m-%d %H:%M:%.S'
+	export WEBUI_IQBIT_PORT="8081"
 fi
 
 export APPLICATION="qbittorrent"
@@ -136,6 +138,15 @@ sed -i '/# ENVVARS_PLACEHOLDER/{
     r /tmp/envvars_heredoc
 }' /usr/local/bin/init.sh
 rm /tmp/envvars_heredoc
+
+
+# Installing iQbit frontend
+git clone https://github.com/ntoporcov/iQbit.git /home/nobody/iqbit
+cd /home/nobody/iqbit
+yarn install
+yarn server-setup
+yarn build
+cd ~
 
 # cleanup
 cleanup.sh

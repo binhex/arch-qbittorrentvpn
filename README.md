@@ -1,5 +1,6 @@
 **Application**
 
+[iQbit](https://github.com/ntoporcov/iQbit)<br/>
 [qBittorrent](https://www.qbittorrent.org/)<br/>
 [Privoxy](http://www.privoxy.org/)<br/>
 [OpenVPN](https://openvpn.net/)<br/>
@@ -13,6 +14,7 @@ This Docker includes OpenVPN and WireGuard to ensure a secure and private connec
 
 **Build notes**
 
+Latest repo release of iQbit from official repo (self built).<br/>
 Latest stable qBittorrent release from Arch Linux repo.<br/>
 Latest stable Privoxy release from Arch Linux repo.<br/>
 Latest stable OpenVPN release from Arch Linux repo.<br/>
@@ -24,7 +26,7 @@ docker run -d \
     --cap-add=NET_ADMIN \
     -p 6881:6881 \
     -p 6881:6881/udp \
-    -p 8080:8080 \
+    -p 8081:8081 \
     -p 8118:8118 \
     --name=<container name> \
     -v <path for data files>:/data \
@@ -43,7 +45,7 @@ docker run -d \
     -e VPN_INPUT_PORTS=<port number(s)> \
     -e VPN_OUTPUT_PORTS=<port number(s)> \
     -e DEBUG=<true|false> \
-    -e WEBUI_PORT=<port for web interfance> \
+    -e WEBUI_IQBIT_PORT=<port for web interfance> \
     -e UMASK=<umask for created files> \
     -e PUID=<uid for user> \
     -e PGID=<gid for user> \
@@ -52,9 +54,9 @@ docker run -d \
 &nbsp;
 Please replace all user variables in the above command defined by <> with the correct values.
 
-**Access qBittorrent (web ui)**
+**Access qBittorrent/iQbit (web ui)**
 
-`http://<host ip>:8080/`
+`http://<host ip>:8081/`
 
 Username:- admin
 Password:- adminadmin
@@ -69,7 +71,7 @@ docker run -d \
     --cap-add=NET_ADMIN \
     -p 6881:6881 \
     -p 6881:6881/udp \
-    -p 8080:8080 \
+    -p 8081:8081 \
     -p 8118:8118 \
     --name=qbittorrentvpn \
     -v /root/docker/data:/data \
@@ -87,7 +89,7 @@ docker run -d \
     -e VPN_INPUT_PORTS=1234 \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
-    -e WEBUI_PORT=8080 \
+    -e WEBUI_IQBIT_PORT=8081 \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
@@ -119,7 +121,7 @@ docker run -d \
     --cap-add=NET_ADMIN \
     -p 6881:6881 \
     -p 6881:6881/udp \
-    -p 8080:8080 \
+    -p 8081:8081 \
     -p 8118:8118 \
     --name=qbittorrentvpn \
     -v /root/docker/data:/data \
@@ -134,7 +136,7 @@ docker run -d \
     -e VPN_INPUT_PORTS=1234 \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
-    -e WEBUI_PORT=8080 \
+    -e WEBUI_IQBIT_PORT=8081 \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
@@ -185,9 +187,9 @@ User ID (PUID) and Group ID (PGID) can be found by issuing the following command
 
 `id <username>`
 
-Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
+Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8081 switch AND set the WEBUI_IQBIT_PORT variable to the new port.
 
-For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
+For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_IQBIT_PORT=8090
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 
