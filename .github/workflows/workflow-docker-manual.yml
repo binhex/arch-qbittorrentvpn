@@ -81,14 +81,6 @@ jobs:
           tags: ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
           build-args: |
             RELEASETAG=${{ github.event.inputs.tags }}
-      - name: Run tests using previously built image
-        shell: bash
-        run: |
-          git_clone_scripts_dest="/tmp/scripts"
-          git_clone_scripts_repo="https://github.com/binhex/scripts.git"
-          git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
-          "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
-      # note this will re-use the internal cached amd64 image from the previous build
       - name: Build multi-arch Docker image, tag and push to registries
         uses: docker/build-push-action@v5
         with:
