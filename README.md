@@ -27,6 +27,7 @@ docker run -d \
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8081:8081 \
+    -p 8080:8080 \
     -p 8118:8118 \
     --name=<container name> \
     -v <path for data files>:/data \
@@ -72,6 +73,7 @@ docker run -d \
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8081:8081 \
+    -p 8080:8080 \
     -p 8118:8118 \
     --name=qbittorrentvpn \
     -v /root/docker/data:/data \
@@ -122,6 +124,7 @@ docker run -d \
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8081:8081 \
+    -p 8080:8080 \
     -p 8118:8118 \
     --name=qbittorrentvpn \
     -v /root/docker/data:/data \

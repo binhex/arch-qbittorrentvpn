@@ -39,6 +39,9 @@ EXPOSE 6881
 # expose port for iqbit http
 EXPOSE 8081
 
+# expose port for qbittorrent
+EXPOSE 8080
+
 # expose port for privoxy
 EXPOSE 8118
 
