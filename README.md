@@ -57,7 +57,7 @@ Please replace all user variables in the above command defined by <> with the co
 
 `http://<host ip>:8080/`
 
-Username:- admin
+Username:- admin<br>
 Password:- randomly generated if not defined - see `/config/supervisord.log`
 
 **Access Privoxy**
