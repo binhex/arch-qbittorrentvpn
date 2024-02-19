@@ -1,34 +1,5 @@
 #!/usr/bin/dumb-init /bin/bash
 
-# define destination file path for qbittorrent config file
-qbittorrent_config="/config/qBittorrent/config/qBittorrent.conf"
-
-# if qbittorrent config file doesnt exist then copy default to host config volume
-if [[ ! -f "${qbittorrent_config}" ]]; then
-
-	echo "[info] qBittorrent config file doesnt exist, copying default to /config/qBittorrent/config/..."
-
-	# copy default qbittorrent config file to /config/qBittorrent/config/
-	mkdir -p /config/qBittorrent/config && cp /home/nobody/qbittorrent/config/* /config/qBittorrent/config/
-
-else
-
-	echo "[info] qBittorrent config file already exists, skipping copy"
-
-fi
-
-echo "[info] Removing session lock file (if it exists)..."
-rm -f /config/qBittorrent/data/BT_backup/session.lock
-
-# force unix line endings conversion in case user edited qbittorrent.conf with notepad
-/usr/local/bin/dos2unix.sh "${qbittorrent_config}"
-
-# set locale to prevent 4.1.4 gui render issues if no locale set
-grep -q 'General\\Locale' "${qbittorrent_config}" || sed -i '/\[Preferences\]/a General\\Locale=en' "${qbittorrent_config}"
-
-# forcibly set allow anonymous access from localhost to api (used to change incoming port)
-sed -i 's~^WebUI\\LocalHostAuth=.*~WebUI\\LocalHostAuth=false~g' "${qbittorrent_config}"
-
 # set default values for port and ip
 qbittorrent_port="6881"
 qbittorrent_ip="0.0.0.0"
