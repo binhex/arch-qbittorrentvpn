@@ -41,6 +41,7 @@ docker run -d \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRICT_PORT_FORWARD=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
+    -e ENABLE_STARTUP_SCRIPTS=<yes|no> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
     -e VPN_INPUT_PORTS=<port number(s)> \
@@ -59,8 +60,8 @@ Please replace all user variables in the above command defined by <> with the co
 
 `http://<host ip>:8081/`
 
-Username:- admin
-Password:- adminadmin
+Username:- `admin`<br>
+Password:- randomly generated, password shown in `/config/supervisord.log`
 
 **Access Privoxy**
 
@@ -86,6 +87,7 @@ docker run -d \
     -e VPN_CLIENT=openvpn \
     -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
+    -e ENABLE_STARTUP_SCRIPTS=no \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e VPN_INPUT_PORTS=1234 \
@@ -134,6 +136,7 @@ docker run -d \
     -e VPN_PROV=airvpn \
     -e VPN_CLIENT=openvpn \
     -e ENABLE_PRIVOXY=yes \
+    -e ENABLE_STARTUP_SCRIPTS=no \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e VPN_INPUT_PORTS=1234 \
