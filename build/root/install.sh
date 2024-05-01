@@ -31,7 +31,7 @@ TARGETARCH="${2}"
 source upd.sh
 
 # define pacman packages
-pacman_packages="qbittorrent-nox python geoip"
+pacman_packages="qbittorrent-nox python geoip ldns"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
