@@ -139,7 +139,8 @@ Alternatively, you can configure it via the filesystem located at `/config/qbitt
 session\Port=49400
 ```
 
-## **IMPORTANT** 
+## IMPORTANT Note On VPN_INPUT_PORTS!
+
 Please note 'VPN_INPUT_PORTS' is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow into the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 
 ## OpenVPN
