@@ -1,25 +1,45 @@
-# **Application**
+# binhex/arch-qbittorrentvpn
 
-[qBittorrent](https://www.qbittorrent.org/)<br/>
-[Privoxy](http://www.privoxy.org/)<br/>
-[OpenVPN](https://openvpn.net/)<br/>
-[WireGuard](https://www.wireguard.com/)
+## **Description**
 
-# **Description**
-
-qBittorrent is a BitTorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other BitTorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.
+qBittorrent is a BitTorrent client programmed in C++ / Qt that uses `libtorrent` (sometimes called `libtorrent-rasterbar`) by Arvid Norberg. It aims to be a good alternative to all other BitTorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.
 
 This Docker includes OpenVPN and WireGuard to ensure a secure and private connection to the Internet, including the use of iptables to prevent IP leakage when the tunnel is down. It also includes Privoxy to allow unfiltered access to index sites, to use Privoxy please point your application at `http://<host ip>:8118`.
 
-# **Build notes**
+## What is in the container
 
-Latest stable qBittorrent release from Arch Linux repo.<br/>
-Latest stable Privoxy release from Arch Linux repo.<br/>
-Latest stable OpenVPN release from Arch Linux repo.<br/>
-Latest stable WireGuard release from Arch Linux repo.
+<table>
+    <thead>
+        <tr>
+            <th width="500px">Application</th>
+            <th width="500px">Build Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><a href="https://www.qbittorrent.org/">qBittorrent</a></td>
+            <td><strong>Latest stable</strong> qBittorrent release from Arch Linux repo.</td>
+        </tr>
+        <tr>
+            <td><a href="http://www.privoxy.org/">Privoxy</a></td>
+            <td><strong>Latest stable</strong> Privoxy release from Arch Linux repo.</td>
+        </tr>
+        <tr>
+            <td><a href="https://openvpn.net/">OpenVPN</a></td>
+            <td><strong>Latest stable</strong> OpenVPN release from Arch Linux repo.</td>
+        </tr>
+        <tr>
+            <td><a href="https://www.wireguard.com/">WireGuard</a></td>
+            <td><strong>Latest stable</strong> WireGuard release from Arch Linux repo.</td>
+        </tr>
+    </tbody>
+</table>
 
 ## **Usage**
-```
+
+### Docker Run
+
+```bash
 docker run -d \
     --cap-add=NET_ADMIN \
     -p 6881:6881 \
@@ -53,18 +73,128 @@ docker run -d \
 
 Please replace all user variables in the above command defined by <> with the correct values.
 
-## **Access qBittorrent (web ui)**
+### Docker Compose (docker-compose.yml)
+
+```yaml
+services:
+  qbittorrentvpn:
+    image: binhex/arch-qbittorrentvpn:latest
+    container_name: qbittorrentvpn
+    net_cap:
+      - NET_ADMIN
+    environment:
+      - VPN_ENABLED=<yes|no>
+      - LAN_NETWORK=<lan ipv4 network>/<cidr notation>
+      - VPN_USER=<vpn username>
+      - VPN_PASS=<vpn password>
+      - VPN_PROV=<pia|airvpn|protonvpn|custom>
+      - VPN_CLIENT=<openvpn|wireguard>
+      - ENABLE_PRIVOXY=<yes|no>
+    volumes:
+      - <path for config files>:/config
+      - <path for data files>:/data
+      - <path for wireguard.conf>:/config/wireguard
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+      - 8118:8118
+    restart: unless-stopped
+    healthcheck:
+      test: [ CMD, curl, -f, http://localhost:6881 ]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+```
+
+Please replace all user variables in the above command defined by <> with the correct values.
+
+Once values are added you can spin up the container using `docker compose up -d`
+
+## Access qBittorrent (WebUI)
 
 `http://<host ip>:8080/`
 
-Username:- `admin`<br>
-Password:- randomly generated, password shown in `/config/supervisord.log`
+Username: `admin`<br>
+Password: randomly generated, password shown in `/config/supervisord.log`
 
-## **Access Privoxy**
+## Access Privoxy
 
 `http://<host ip>:8118`
 
-## **PIA example**
+## Port Forwarding
+Port forwarding will need to be specified in qBittorrent (for some VPN providers, i.e. **not PIA**). Generally, it is better practice to use the [WebUI](#access-qbittorrent-webui) to configure this port under: 
+`Tools->Options->Connection`
+
+![image](https://github.com/binhex/arch-qBitTorrentVPN/assets/872224/bcad7fc2-94a2-464a-8e3a-7fa3eae9a3c7)
+
+Then enter the port.
+
+![image](https://github.com/binhex/arch-qBitTorrentVPN/assets/872224/f83e7395-1da0-4fc3-841f-f185ea6d6798)
+
+Alternatively, you can configure it via the filesystem located at `/config/qbittorrent/config/qbittorrent.conf`.
+
+### Example qBittorrent.conf
+```
+session\Port=49400
+```
+
+## **IMPORTANT** 
+Please note 'VPN_INPUT_PORTS' is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow into the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
+
+## OpenVPN
+
+_Please note_, this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN provider's website (look for OpenVPN configuration files), and generally are zipped.
+
+Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
+
+If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows the location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
+
+## WireGuard
+
+If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions and sysctl support, so please ensure you change the following docker options:-
+
+from
+```
+    --cap-add=NET_ADMIN \
+```
+to
+```
+    --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+    --privileged=true \
+```
+
+### Wireguard Note
+
+Non-PIA Users - please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
+
+## **DNS Note**
+Due to Google and OpenDNS supporting EDNS Client Subnet, it is recommended NOT to use either of these NS providers.
+The list of default NS providers in the above example(s) is as follows:-
+
+84.200.x.x = DNS Watch
+37.235.x.x = FreeDNS
+1.x.x.x = Cloudflare
+
+## PUID/PGID
+User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
+
+`id <username>`
+
+## Note on port matching
+
+Due to issues with CSRF and port mapping, should you require to alter the port for the WebUI you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
+
+For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
+
+---
+
+## Provider Specific Examples
+
+### PIA
+
+#### Docker Run
+
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
@@ -96,35 +226,20 @@ docker run -d \
     binhex/arch-qbittorrentvpn
 ```
 
-## **AirVPN provider**
+#### Open VPN Notes
 
-AirVPN users will need to generate a unique OpenVPN configuration file by using the following link https://airvpn.org/generator/
+PIA users - The URL to download the OpenVPN configuration files and certs is:-
 
-1. Please select Linux and then choose the country you want to connect to
-2. Save the ovpn file to somewhere safe
-3. Start the QBitTorrentVPN docker to create the folder structure
-4. Stop QBitTorrentVPN docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
-5. Start QBitTorrentVPN docker
-6. Check supervisor.log to make sure you are connected to the tunnel
+https://www.privateinternetaccess.com/openvpn/openvpn.zip
 
-### Port Forwarding
-AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in qBittorrent. Generally, it is better practice to use the WebUI to configure this port under: 
-`Tools->Options->Connection`
+#### Wireguard Notes
 
-![image](https://github.com/binhex/arch-QBitTorrentVPN/assets/872224/bcad7fc2-94a2-464a-8e3a-7fa3eae9a3c7)
+PIA users - The WireGuard configuration file will be auto-generated and will be stored in ```/config/wireguard/wg0.conf``` AFTER the first run, if you wish to change the endpoint you are connecting to then change the ```Endpoint``` line in the config file (default is Netherlands).
 
-Then enter the port.
+### AirVPN
 
-![image](https://github.com/binhex/arch-QBitTorrentVPN/assets/872224/f83e7395-1da0-4fc3-841f-f185ea6d6798)
+#### Docker Run
 
-Alternatively, you can configure it via the filesystem located at `/config/qbittorrent/config/qbittorrent.conf`.
-
-### Example qBittorrent.conf
-```
-session\Port=49400
-```
-
-### **AirVPN example**
 ```
 docker run -d \
     --cap-add=NET_ADMIN \
@@ -153,61 +268,21 @@ docker run -d \
     binhex/arch-qbittorrentvpn
 ```
 
+#### Open VPN Configuration
 
-## **IMPORTANT** 
-Please note 'VPN_INPUT_PORTS' is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow into the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
+AirVPN users will need to generate a unique OpenVPN configuration file by using the following link https://airvpn.org/generator/
 
-## **OpenVPN**<br/>
-Please note this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN provider's website (look for OpenVPN configuration files), and generally are zipped.
+1. Please select Linux and then choose the country you want to connect to
+2. Save the ovpn file to somewhere safe
+3. Start the qBitTorrentVPN docker to create the folder structure
+4. Stop qBitTorrentVPN docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
+5. Start qBitTorrentVPN docker
+6. Check supervisor.log to make sure you are connected to the tunnel
 
-PIA users - The URL to download the OpenVPN configuration files and certs is:-
+#### Port Forwarding
 
-https://www.privateinternetaccess.com/openvpn/openvpn.zip
+AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add.
 
-Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
-
-If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows the location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
-
-## **WireGuard**
-
-If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions and sysctl support, so please ensure you change the following docker options:-  <br/>
-
-from
-```
-    --cap-add=NET_ADMIN \
-```
-to
-```
-    --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
-    --privileged=true \
-```
-
-### PIA Note
-
-PIA users - The WireGuard configuration file will be auto-generated and will be stored in ```/config/wireguard/wg0.conf``` AFTER the first run, if you wish to change the endpoint you are connecting to then change the ```Endpoint``` line in the config file (default is Netherlands).
-
-### Other Wireguard Note
-
-Other users - Please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
-
-## **DNS Note**
-Due to Google and OpenDNS supporting EDNS Client Subnet, it is recommended NOT to use either of these NS providers.
-The list of default NS providers in the above example(s) is as follows:-
-
-84.200.x.x = DNS Watch
-37.235.x.x = FreeDNS
-1.x.x.x = Cloudflare
-
-## PUID/PGID
-User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
-
-`id <username>`
-
-## Note on port matching
-
-Due to issues with CSRF and port mapping, should you require to alter the port for the WebUI you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
-
-For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 
