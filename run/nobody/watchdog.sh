@@ -86,7 +86,8 @@ while true; do
 						if [ "${sleep_period_counter_secs}" -ge "${sleep_period_incoming_port_secs}" ]; then
 
 							# run script to check incoming port is accessible
-							source /home/nobody/checkextport.sh
+							source tools.sh
+							check_incoming_port
 
 							# reset sleep period counter
 							sleep_period_counter_secs=0
