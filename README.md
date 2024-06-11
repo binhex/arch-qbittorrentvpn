@@ -1,25 +1,26 @@
-**Application**
+# Application
 
-[qBittorrent](https://www.qbittorrent.org/)<br/>
-[Privoxy](http://www.privoxy.org/)<br/>
-[OpenVPN](https://openvpn.net/)<br/>
+[qBittorrent](https://www.qbittorrent.org/)
+[Privoxy](http://www.privoxy.org/)
+[OpenVPN](https://openvpn.net/)
 [WireGuard](https://www.wireguard.com/)
 
-**Description**
+## Description
 
-qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other bittorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.<br/>
+qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other bittorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.
 
 This Docker includes OpenVPN and WireGuard to ensure a secure and private connection to the Internet, including use of iptables to prevent IP leakage when the tunnel is down. It also includes Privoxy to allow unfiltered access to index sites, to use Privoxy please point your application at `http://<host ip>:8118`.
 
-**Build notes**
+## Build notes
 
-Latest stable qBittorrent release from Arch Linux repo.<br/>
-Latest stable Privoxy release from Arch Linux repo.<br/>
-Latest stable OpenVPN release from Arch Linux repo.<br/>
+Latest stable qBittorrent release from Arch Linux repo.
+Latest stable Privoxy release from Arch Linux repo.
+Latest stable OpenVPN release from Arch Linux repo.
 Latest stable WireGuard release from Arch Linux repo.
 
-**Usage**
-```
+## Usage
+
+```bash
 docker run -d \
     --cap-add=NET_ADMIN \
     -p 6881:6881 \
@@ -54,22 +55,23 @@ docker run -d \
     -e PGID=<gid for user> \
     binhex/arch-qbittorrentvpn
 ```
-&nbsp;
+
 Please replace all user variables in the above command defined by <> with the correct values.
 
-**Access qBittorrent (web ui)**
+## Access qBittorrent (web ui)
 
 `http://<host ip>:8080/`
 
-Username:- `admin`<br>
+Username:- `admin`
 Password:- randomly generated, password shown in `/config/supervisord.log`
 
-**Access Privoxy**
+## Access Privoxy
 
 `http://<host ip>:8118`
 
-**PIA example**
-```
+## PIA example
+
+```bash
 docker run -d \
     --cap-add=NET_ADMIN \
     -p 6881:6881 \
@@ -103,34 +105,36 @@ docker run -d \
     -e PGID=0 \
     binhex/arch-qbittorrentvpn
 ```
-&nbsp;
 
-**IMPORTANT**<br/>
+## IMPORTANT
 
 Please note 'VPN_INPUT_PORTS' is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 
-**OpenVPN**<br/>
+## OpenVPN
 
 Please note this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN providers website (look for OpenVPN configuration files), and generally are zipped.
 
 PIA users - The URL to download the OpenVPN configuration files and certs is:-
 
-https://www.privateinternetaccess.com/openvpn/openvpn.zip
+[https://www.privateinternetaccess.com/openvpn/openvpn.zip]
 
 Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
 
 If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
 
-**WireGuard**<br/>
+## WireGuard
 
 If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions and sysctl support, so please ensure you change the following docker options:-  <br/>
 
 from
-```
+
+``` bash
     --cap-add=NET_ADMIN \
 ```
+
 to
-```
+
+``` bash
     --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
     --privileged=true \
 ```
@@ -139,7 +143,7 @@ PIA users - The WireGuard configuration file will be auto generated and will be 
 
 Other users - Please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
 
-**Notes**<br/>
+## Notes
 
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
@@ -160,15 +164,20 @@ For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_P
 
 ---
 If you are using VPN provider PIA or ProtonVPN and wish to share the assigned dynamic incoming port with another docker container running in the same network then this can be done via a docker volume, so add the following to your docker run command:-
-```
+
+``` bash
     -v <name of volume>:/shared \
 ```
+
 e.g.
-```
+
+```bash
     -v binhex-shared:/shared \
 ```
+
 The incoming port will then be available in `/shared/getvpnport`.
-___
+
+---
 If you appreciate my work, then please consider buying me a beer  :D
 
 [![PayPal donation](https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MM5E27UX6AUU4)
