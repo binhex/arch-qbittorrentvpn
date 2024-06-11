@@ -1,21 +1,21 @@
 # Application
 
-[qBittorrent](https://www.qbittorrent.org/)
-[Privoxy](http://www.privoxy.org/)
-[OpenVPN](https://openvpn.net/)
+[qBittorrent](https://www.qbittorrent.org/)<br/>
+[Privoxy](http://www.privoxy.org/)<br/>
+[OpenVPN](https://openvpn.net/)<br/>
 [WireGuard](https://www.wireguard.com/)
 
 ## Description
 
-qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other bittorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.
+qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other bittorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.<br/>
 
 This Docker includes OpenVPN and WireGuard to ensure a secure and private connection to the Internet, including use of iptables to prevent IP leakage when the tunnel is down. It also includes Privoxy to allow unfiltered access to index sites, to use Privoxy please point your application at `http://<host ip>:8118`.
 
 ## Build notes
 
-Latest stable qBittorrent release from Arch Linux repo.
-Latest stable Privoxy release from Arch Linux repo.
-Latest stable OpenVPN release from Arch Linux repo.
+Latest stable qBittorrent release from Arch Linux repo.<br/>
+Latest stable Privoxy release from Arch Linux repo.<br/>
+Latest stable OpenVPN release from Arch Linux repo.<br/>
 Latest stable WireGuard release from Arch Linux repo.
 
 ## Usage
@@ -62,7 +62,7 @@ Please replace all user variables in the above command defined by <> with the co
 
 `http://<host ip>:8080/`
 
-Username:- `admin`
+Username:- `admin`<br/>
 Password:- randomly generated, password shown in `/config/supervisord.log`
 
 ## Access Privoxy
