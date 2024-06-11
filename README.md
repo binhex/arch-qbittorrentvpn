@@ -36,9 +36,13 @@ docker run -d \
     -e VPN_PROV=<pia|airvpn|protonvpn|custom> \
     -e VPN_CLIENT=<openvpn|wireguard> \
     -e VPN_OPTIONS=<additional openvpn cli options> \
-    -e STRICT_PORT_FORWARD=<yes|no> \
-    -e ENABLE_PRIVOXY=<yes|no> \
     -e ENABLE_STARTUP_SCRIPTS=<yes|no> \
+    -e ENABLE_PRIVOXY=<yes|no> \
+    -e STRICT_PORT_FORWARD=<yes|no> \
+    -e USERSPACE_WIREGUARD=<yes|no> \
+    -e ENABLE_SOCKS=<yes|no> \
+    -e SOCKS_USER=<socks username> \
+    -e SOCKS_PASS=<socks password> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
     -e VPN_INPUT_PORTS=<port number(s)> \
@@ -81,57 +85,13 @@ docker run -d \
     -e VPN_PASS=mypassword \
     -e VPN_PROV=pia \
     -e VPN_CLIENT=openvpn \
+    -e ENABLE_STARTUP_SCRIPTS=no \
+    -e ENABLE_PRIVOXY=yes \
     -e STRICT_PORT_FORWARD=yes \
-    -e ENABLE_PRIVOXY=yes \
-    -e ENABLE_STARTUP_SCRIPTS=no \
-    -e LAN_NETWORK=192.168.1.0/24 \
-    -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
-    -e VPN_INPUT_PORTS=1234 \
-    -e VPN_OUTPUT_PORTS=5678 \
-    -e DEBUG=false \
-    -e WEBUI_PORT=8080 \
-    -e UMASK=000 \
-    -e PUID=0 \
-    -e PGID=0 \
-    binhex/arch-qbittorrentvpn
-```
-&nbsp;
-**AirVPN provider**
-
-AirVPN users will need to generate a unique OpenVPN configuration file by using the following link https://airvpn.org/generator/
-
-1. Please select Linux and then choose the country you want to connect to
-2. Save the ovpn file to somewhere safe
-3. Start the qbittorrentvpn docker to create the folder structure
-4. Stop qbittorrentvpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
-5. Start qbittorrentvpn docker
-6. Check supervisor.log to make sure you are connected to the tunnel
-
-AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the qBittorrent configuration file located at /config/qbittorrent/config/qbittorrent.conf.
-
-qBittorrent example config
-```
-port_range = 49400-49400
-port_random = no
-```
-&nbsp;
-**AirVPN example**
-```
-docker run -d \
-    --cap-add=NET_ADMIN \
-    -p 6881:6881 \
-    -p 6881:6881/udp \
-    -p 8080:8080 \
-    -p 8118:8118 \
-    --name=qbittorrentvpn \
-    -v /root/docker/data:/data \
-    -v /root/docker/config:/config \
-    -v /etc/localtime:/etc/localtime:ro \
-    -e VPN_ENABLED=yes \
-    -e VPN_PROV=airvpn \
-    -e VPN_CLIENT=openvpn \
-    -e ENABLE_PRIVOXY=yes \
-    -e ENABLE_STARTUP_SCRIPTS=no \
+    -e USERSPACE_WIREGUARD=no \
+    -e ENABLE_SOCKS=yes \
+    -e SOCKS_USER=admin \
+    -e SOCKS_PASS=socks \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e VPN_INPUT_PORTS=1234 \
@@ -177,20 +137,30 @@ PIA users - The WireGuard configuration file will be auto generated and will be 
 Other users - Please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
 
 **Notes**<br/>
-Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
+- Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
 84.200.x.x = DNS Watch
 37.235.x.x = FreeDNS
 1.x.x.x = Cloudflare
 
-User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
+- User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
 
 `id <username>`
 
-Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
+- Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
 
 For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
+
+- If you are using VPN provider PIA or ProtonVPN and wish to share the assigned dynamic incoming port with another docker container running in the same network then this can be done via a docker volume, so add the following to your docker run command:-
+```
+    -v <name of volume>:/shared \
+```
+e.g.
+```
+    -v binhex-shared:/shared \
+```
+The incoming port will then be available in `/shared/getvpnport`.
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 
