@@ -24,7 +24,7 @@ Latest stable WireGuard release from Arch Linux repo.
 
 ```bash
 docker run -d \
-    --cap-add=NET_ADMIN \
+    --cap-add=NET_ADMIN \<!-- markdownlint-disable MD034 -->
     -p 6881:6881 \
     -p 6881:6881/udp \
     -p 8080:8080 \
@@ -118,7 +118,7 @@ Please note this Docker image does not include the required OpenVPN configuratio
 
 PIA users - The URL to download the OpenVPN configuration files and certs is:-
 
-[https://www.privateinternetaccess.com/openvpn/openvpn.zip]
+[](https://www.privateinternetaccess.com/openvpn/openvpn.zip)
 
 Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
 
