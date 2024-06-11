@@ -151,7 +151,7 @@ ___
 Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
 
 For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
-___
+---
 If you are using VPN provider PIA or ProtonVPN and wish to share the assigned dynamic incoming port with another docker container running in the same network then this can be done via a docker volume, so add the following to your docker run command:-
 ```
     -v <name of volume>:/shared \
