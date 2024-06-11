@@ -1,6 +1,6 @@
 # Application
 
-{{< /*<!-- markdownlint-disable MD033 -->*/ >}}
+{{< mdl-disable "MD033" >}}
 
 [qBittorrent](https://www.qbittorrent.org/)<br/>
 [Privoxy](http://www.privoxy.org/)<br/>
