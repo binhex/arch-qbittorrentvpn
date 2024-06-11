@@ -1,5 +1,7 @@
 # Application
 
+{{< /*<!-- markdownlint-disable MD033 -->*/ >}}
+
 [qBittorrent](https://www.qbittorrent.org/)<br/>
 [Privoxy](http://www.privoxy.org/)<br/>
 [OpenVPN](https://openvpn.net/)<br/>
