@@ -4,6 +4,7 @@
 
 [qBittorrent](https://www.qbittorrent.org/)<br/>
 [Privoxy](http://www.privoxy.org/)<br/>
+[microsocks](https://github.com/rofl0r/microsocks)<br/>
 [OpenVPN](https://openvpn.net/)<br/>
 [WireGuard](https://www.wireguard.com/)
 
