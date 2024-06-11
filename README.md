@@ -118,7 +118,7 @@ Please note this Docker image does not include the required OpenVPN configuratio
 
 PIA users - The URL to download the OpenVPN configuration files and certs is:-
 
-(https://www.privateinternetaccess.com/openvpn/openvpn.zip)
+[PIA OpenVPN configuration](https://www.privateinternetaccess.com/openvpn/openvpn.zip)
 
 Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
 
