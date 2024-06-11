@@ -137,22 +137,22 @@ PIA users - The WireGuard configuration file will be auto generated and will be 
 Other users - Please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
 
 **Notes**<br/>
-- Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
+Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
 84.200.x.x = DNS Watch
 37.235.x.x = FreeDNS
 1.x.x.x = Cloudflare
-
-- User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
+___
+User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
 
 `id <username>`
-
-- Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
+___
+Due to issues with CSRF and port mapping, should you require to alter the port for the webui you need to change both sides of the -p 8080 switch AND set the WEBUI_PORT variable to the new port.
 
 For example, to set the port to 8090 you need to set -p 8090:8090 and -e WEBUI_PORT=8090
-
-- If you are using VPN provider PIA or ProtonVPN and wish to share the assigned dynamic incoming port with another docker container running in the same network then this can be done via a docker volume, so add the following to your docker run command:-
+___
+If you are using VPN provider PIA or ProtonVPN and wish to share the assigned dynamic incoming port with another docker container running in the same network then this can be done via a docker volume, so add the following to your docker run command:-
 ```
     -v <name of volume>:/shared \
 ```
