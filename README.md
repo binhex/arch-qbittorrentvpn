@@ -24,7 +24,7 @@ Latest stable WireGuard release from Arch Linux repo.
 
 ## Usage
 
-```bash
+```text
 docker run -d \
     --cap-add=NET_ADMIN \
     -p 8080:8080 \
@@ -82,7 +82,7 @@ default credentials: admin/socks
 
 ## PIA example
 
-```
+```bash
 docker run -d \
     --cap-add=NET_ADMIN \
     -p 8080:8080 \
