@@ -161,7 +161,7 @@ The list of default NS providers in the above example(s) is as follows:-
 1.x.x.x = Cloudflare
 
 ---
-**IMPORTANT**
+**IMPORTANT**<br/>
 Please note `VPN_INPUT_PORTS` is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 
 ---
