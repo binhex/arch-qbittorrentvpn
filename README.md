@@ -118,10 +118,6 @@ docker run -d \
     binhex/arch-qbittorrentvpn
 ```
 
-##### IMPORTANT
-
-Please note `VPN_INPUT_PORTS` is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
-
 ## OpenVPN
 
 Please note this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN providers website (look for OpenVPN configuration files), and generally are zipped.
@@ -163,6 +159,10 @@ The list of default NS providers in the above example(s) is as follows:-
 84.200.x.x = DNS Watch<br/>
 37.235.x.x = FreeDNS<br/>
 1.x.x.x = Cloudflare
+
+---
+**IMPORTANT**
+Please note `VPN_INPUT_PORTS` is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 
 ---
 User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
