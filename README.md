@@ -18,6 +18,7 @@ This Docker includes OpenVPN and WireGuard to ensure a secure and private connec
 
 Latest stable qBittorrent release from Arch Linux repo.<br/>
 Latest stable Privoxy release from Arch Linux repo.<br/>
+Latest stable microsocks release from GitHub.<br/>
 Latest stable OpenVPN release from Arch Linux repo.<br/>
 Latest stable WireGuard release from Arch Linux repo.
 
@@ -25,11 +26,12 @@ Latest stable WireGuard release from Arch Linux repo.
 
 ```bash
 docker run -d \
-    --cap-add=NET_ADMIN \<!-- markdownlint-disable MD034 -->
-    -p 6881:6881 \
-    -p 6881:6881/udp \
+    --cap-add=NET_ADMIN \
     -p 8080:8080 \
     -p 8118:8118 \
+    -p 9118:9118 \
+    -p 58946:58946 \
+    -p 58946:58946/udp \
     --name=<container name> \
     -v <path for data files>:/data \
     -v <path for config files>:/config \
@@ -72,15 +74,22 @@ Password:- randomly generated, password shown in `/config/supervisord.log`
 
 `http://<host ip>:8118`
 
+## Access microsocks
+
+`<host ip>:9118`
+
+default credentials: admin/socks
+
 ## PIA example
 
 ```bash
 docker run -d \
     --cap-add=NET_ADMIN \
-    -p 6881:6881 \
-    -p 6881:6881/udp \
     -p 8080:8080 \
     -p 8118:8118 \
+    -p 9118:9118 \
+    -p 58946:58946 \
+    -p 58946:58946/udp \
     --name=qbittorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
@@ -109,7 +118,7 @@ docker run -d \
     binhex/arch-qbittorrentvpn
 ```
 
-## IMPORTANT
+### IMPORTANT
 
 Please note `VPN_INPUT_PORTS` is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 

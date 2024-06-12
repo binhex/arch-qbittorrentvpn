@@ -30,18 +30,6 @@ ADD config/nobody/ /home/nobody/
 RUN chmod +x /root/*.sh /home/nobody/*.sh && \
 	/bin/bash /root/install.sh "${RELEASETAG}" "${TARGETARCH}" "${TARGETARCH}"
 
-# docker settings
-#################
-
-# expose port for incoming connections (used only if vpn disabled)
-EXPOSE 6881
-
-# expose port for qbittorrent http
-EXPOSE 8080
-
-# expose port for privoxy
-EXPOSE 8118
-
 # set permissions
 #################
 
