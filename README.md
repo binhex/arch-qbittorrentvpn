@@ -118,7 +118,7 @@ docker run -d \
     binhex/arch-qbittorrentvpn
 ```
 
-### IMPORTANT
+#### IMPORTANT
 
 Please note `VPN_INPUT_PORTS` is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 
