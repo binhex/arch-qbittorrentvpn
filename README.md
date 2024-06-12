@@ -82,7 +82,7 @@ default credentials: admin/socks
 
 ## PIA example
 
-```text
+```
 docker run -d \
     --cap-add=NET_ADMIN \
     -p 8080:8080 \
