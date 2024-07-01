@@ -91,7 +91,7 @@ jobs:
           action: docker/build-push-action@v5
           with: |
             context: .
-            platforms: linux/amd64
+            platforms: linux/amd64,linux/arm64
             push: true
             tags: ${{ github.repository }}:${{ github.event.inputs.tags }}, quay.io/${{ github.repository }}:${{ github.event.inputs.tags }}, ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}, registry.gitlab.com/${{ github.repository }}:${{ github.event.inputs.tags }}
             build-args: |
