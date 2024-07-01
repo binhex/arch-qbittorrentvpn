@@ -46,24 +46,16 @@ jobs:
           repository: ${{ github.repository }}
           short-description: ${{ github.event.repository.description }}
       - name: DEBUG Show Runners environment
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          retry_wait_seconds: 120
-          command: |
+        shell: bash
+        run: |
             export
       - name: Identify GitHub Release tag name
         # get tag name from runners environment 'GITHUB_REF_NAME' and then use bash substring
         # to strip out '+' symbol - required due to gcr not supporting this as a tag
         # name (docker hub does support it).
         # note if push is NOT triggered by tag then 'GITHUB_REF_NAME' will be the branch name.
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          retry_wait_seconds: 120
-          command: |
+        shell: bash
+        run: |
             tag="${GITHUB_REF_NAME}" && echo "tag=${tag//+/-}" >> $GITHUB_OUTPUT
             echo "[debug] Generated tag name is '${tag}'"
             echo "tag=$tag" >> $GITHUB_OUTPUT
@@ -83,13 +75,15 @@ jobs:
           echo "app_name=$app_name" >> $GITHUB_OUTPUT
         id: generate_app_name
       - name: Build amd64 image and export to Docker for testing
-        uses: docker/build-push-action@v5
+        uses: Wandalen/wretry.action@v3
         with:
-          context: .
-          load: true
-          tags: ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
-          build-args: |
-            RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.tag }}
+          action: docker/build-push-action@v5
+          with: |
+            context: .
+            load: true
+            tags: ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
+            build-args: |
+              RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.tag }}
       - name: Run tests using previously built image
         shell: bash
         run: |
@@ -99,11 +93,13 @@ jobs:
           "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
       # note this will re-use the internal cached amd64 image from the previous build
       - name: Build multi-arch Docker image, tag and push to registries
-        uses: docker/build-push-action@v5
+        uses: Wandalen/wretry.action@v3
         with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ github.repository }}:latest, ${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, quay.io/${{ github.repository }}:latest, quay.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, registry.gitlab.com/${{ github.repository }}:latest, registry.gitlab.com/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
-          build-args: |
-            RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.tag }}
+          action: docker/build-push-action@v5
+          with: |
+            context: .
+            platforms: linux/amd64
+            push: true
+            tags: ${{ github.repository }}:latest, ${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, quay.io/${{ github.repository }}:latest, quay.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}, registry.gitlab.com/${{ github.repository }}:latest, registry.gitlab.com/${{ github.repository }}:${{ steps.identify_github_release_tag_name.outputs.tag }}
+            build-args: |
+              RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.tag }}
