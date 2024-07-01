@@ -48,12 +48,8 @@ jobs:
           repository: ${{ github.repository }}
           short-description: ${{ github.event.repository.description }}
       - name: DEBUG Show Runners environment
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          retry_wait_seconds: 120
-          command: |
+        shell: bash
+        run: |
             export
       - name: Generate temporary tag name
         shell: bash
@@ -70,13 +66,17 @@ jobs:
           echo "app_name=$app_name" >> $GITHUB_OUTPUT
         id: generate_app_name
       - name: Build amd64 image and export to Docker for testing
-        uses: docker/build-push-action@v5
+        uses: Wandalen/wretry.action@v3
         with:
-          context: .
-          load: true
-          tags: ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
-          build-args: |
-            RELEASETAG=${{ github.event.inputs.tags }}
+          action: docker/build-push-action@v5
+          with: |
+            context: .
+            load: true
+            tags: ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
+            build-args: |
+              RELEASETAG=${{ github.event.inputs.tags }}
+          attempt_limit: 3
+          attempt_delay: 600000
       - name: Run tests using previously built image
         shell: bash
         run: |
@@ -86,11 +86,13 @@ jobs:
           "${git_clone_scripts_dest}/shell/arch/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
       # note this will re-use the internal cached amd64 image from the previous build
       - name: Build multi-arch Docker image, tag and push to registries
-        uses: docker/build-push-action@v5
+        uses: Wandalen/wretry.action@v3
         with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ github.repository }}:${{ github.event.inputs.tags }}, quay.io/${{ github.repository }}:${{ github.event.inputs.tags }}, ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}, registry.gitlab.com/${{ github.repository }}:${{ github.event.inputs.tags }}
-          build-args: |
-            RELEASETAG=${{ github.event.inputs.tags }}
+          action: docker/build-push-action@v5
+          with: |
+            context: .
+            platforms: linux/amd64
+            push: true
+            tags: ${{ github.repository }}:${{ github.event.inputs.tags }}, quay.io/${{ github.repository }}:${{ github.event.inputs.tags }}, ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}, registry.gitlab.com/${{ github.repository }}:${{ github.event.inputs.tags }}
+            build-args: |
+              RELEASETAG=${{ github.event.inputs.tags }}
