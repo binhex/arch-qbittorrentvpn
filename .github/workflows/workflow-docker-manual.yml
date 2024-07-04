@@ -96,3 +96,5 @@ jobs:
             tags: ${{ github.repository }}:${{ github.event.inputs.tags }}, quay.io/${{ github.repository }}:${{ github.event.inputs.tags }}, ghcr.io/${{ github.repository }}:${{ github.event.inputs.tags }}, registry.gitlab.com/${{ github.repository }}:${{ github.event.inputs.tags }}
             build-args: |
               RELEASETAG=${{ github.event.inputs.tags }}
+          attempt_limit: 3
+          attempt_delay: 600000
