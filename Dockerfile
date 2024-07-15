@@ -1,6 +1,6 @@
 FROM binhex/arch-int-vpn:latest
-LABEL org.opencontainers.image.authors = "binhex"
-LABEL org.opencontainers.image.source = "https://github.com/binhex/arch-qbittorrentvpn"
+LABEL org.opencontainers.image.authors="binhex"
+LABEL org.opencontainers.image.source="https://github.com/binhex/arch-qbittorrentvpn"
 
 # release tag name from buildx arg
 ARG RELEASETAG
