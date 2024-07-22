@@ -4,7 +4,7 @@
 set -e
 
 # release tag name from buildx arg, stripped of build ver using string manipulation
-RELEASETAG="${1//-[0-9][0-9]/}"
+RELEASETAG="${1}"
 
 # target arch from buildx arg
 TARGETARCH="${2}"
@@ -18,6 +18,9 @@ if [[ -z "${TARGETARCH}" ]]; then
 	echo "[warn] Target architecture name from build arg is empty, exiting script..."
 	exit 1
 fi
+
+# write RELEASETAG to file to record the release tag used to build the image
+echo "IMAGE_RELEASE_TAG=${RELEASETAG}" >> '/etc/image-release'
 
 # note do NOT download build scripts - inherited from int script with envvars common defined
 
