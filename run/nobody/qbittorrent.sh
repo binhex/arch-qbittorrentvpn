@@ -56,7 +56,8 @@ function configure_incoming_port(){
 		# note -k flag required to support insecure connection (self signed certs) when https used
 		curl -k -i -X POST -d "json={\"random_port\": false}" "${web_protocol}://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
 		curl -k -i -X POST -d "json={\"listen_port\": ${VPN_INCOMING_PORT}}" "${web_protocol}://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
-
+		# bind VPN ip
+		curl -k -i -X POST -d "json={\"current_interface_address\": ${vpn_ip}}" "${web_protocol}://localhost:${WEBUI_PORT}/api/v2/app/setPreferences" &> /dev/null
 		# set qbittorrent port to current vpn port (used when checking for changes on next run)s
 		qbittorrent_port="${VPN_INCOMING_PORT}"
 
@@ -64,7 +65,6 @@ function configure_incoming_port(){
 
 	# set qbittorrent ip to current vpn ip (used when checking for changes on next run)
 	qbittorrent_ip="${vpn_ip}"
-
 }
 
 function start() {
