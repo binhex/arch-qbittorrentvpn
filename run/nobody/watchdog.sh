@@ -68,6 +68,44 @@ while true; do
 
 			fi
 
+			if [[ "${ENABLE_SOCKS}" == "yes" ]]; then
+
+				# get current bind ip for microsocks, if different to vpn_ip then kill
+				microsocks_current_bind_ip=$(pgrep -fa 'microsocks' | grep -o -P -m 1 '(?<=-b\s)[\d\.]+')
+
+				if [[ "${microsocks_current_bind_ip}" != "${vpn_ip}" ]]; then
+
+					echo "[info] Restarting microsocks due to change in vpn ip..."
+					pkill -SIGTERM "microsocks"
+
+					# run script to start microsocks
+					source /home/nobody/microsocks.sh
+
+				else
+
+					# check if microsocks is running, if not then skip shutdown of process
+					if ! pgrep -fa "/usr/local/bin/microsocks" > /dev/null; then
+
+						echo "[info] microsocks not running"
+
+					else
+
+						# mark microsocks as running
+						microsocks_running="true"
+
+					fi
+
+					if [[ "${microsocks_running}" == "false" ]]; then
+
+						# run script to start microsocks
+						source /home/nobody/microsocks.sh
+
+					fi
+
+				fi
+
+			fi
+
 			if [[ "${VPN_PROV}" == "pia" || "${VPN_PROV}" == "protonvpn" ]]; then
 
 				# if vpn port is not an integer then dont change port
@@ -86,7 +124,8 @@ while true; do
 						if [ "${sleep_period_counter_secs}" -ge "${sleep_period_incoming_port_secs}" ]; then
 
 							# run script to check incoming port is accessible
-							source /home/nobody/checkextport.sh
+							source tools.sh
+							check_incoming_port
 
 							# reset sleep period counter
 							sleep_period_counter_secs=0
@@ -153,6 +192,20 @@ while true; do
 
 				# run script to start privoxy
 				source /home/nobody/privoxy.sh
+
+			fi
+
+		fi
+
+		if [[ "${ENABLE_SOCKS}" == "yes" ]]; then
+
+			# check if microsocks is running, if not then start via microsocks.sh
+			if ! pgrep -fa "/usr/local/bin/microsocks" > /dev/null; then
+
+				echo "[info] microsocks not running"
+
+				# run script to start microsocks
+				source /home/nobody/microsocks.sh
 
 			fi
 
