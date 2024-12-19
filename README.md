@@ -185,21 +185,6 @@ and
 ```
 
 ---
-If you are using VPN provider PIA or ProtonVPN and wish to share the assigned dynamic incoming port with another docker container running in the same network then this can be done via a docker volume, so add the following to your docker run command:-
-
-``` bash
-    -v <name of volume>:/shared \
-```
-
-e.g.
-
-```bash
-    -v binhex-shared:/shared \
-```
-
-The incoming port will then be available in `/shared/getvpnport`.
-
----
 If you appreciate my work, then please consider buying me a beer  :D
 
 [![PayPal donation](https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MM5E27UX6AUU4)
