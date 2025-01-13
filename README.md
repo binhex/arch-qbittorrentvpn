@@ -83,7 +83,7 @@ docker run -d \
     -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
-    -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
+    -e NAME_SERVERS=1.1.1.1,1.0.0.1 \
     -e VPN_INPUT_PORTS=1234 \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
@@ -130,7 +130,7 @@ docker run -d \
     -e VPN_CLIENT=openvpn \
     -e ENABLE_PRIVOXY=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
-    -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
+    -e NAME_SERVERS=1.1.1.1,1.0.0.1 \
     -e VPN_INPUT_PORTS=1234 \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
@@ -177,8 +177,6 @@ Other users - Please download your WireGuard configuration file from your VPN pr
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
-84.200.x.x = DNS Watch
-37.235.x.x = FreeDNS
 1.x.x.x = Cloudflare
 
 User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
