@@ -107,7 +107,7 @@ docker run -d \
     -e SOCKS_USER=admin \
     -e SOCKS_PASS=socks \
     -e LAN_NETWORK=192.168.1.0/24 \
-    -e NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1 \
+    -e NAME_SERVERS=1.1.1.1,1.0.0.1 \
     -e VPN_INPUT_PORTS=1234 \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
