@@ -22,8 +22,6 @@ jobs:
       GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
       GITLAB_USERNAME: ${{ secrets.GITLAB_USERNAME }}
       IMMORTALITY_PAT: ${{ secrets.IMMORTALITY_PAT }}
-      LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
-      LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       TDB_PAT: ${{ secrets.TDB_PAT }}
