@@ -103,7 +103,6 @@ default credentials: admin/socks
 
 ```bash
 docker run -d \
-
     --cap-add=NET_ADMIN \
     -p 8080:8080 \
     -p 8118:8118 \
@@ -135,9 +134,7 @@ docker run -d \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
-
     binhex/arch-qbittorrentvpn
-
 ```
 
 ## OpenVPN
@@ -234,7 +231,6 @@ For example, to set the port to 8090 you need to set:-
 ```bash
 
     -p 8090:8090 \
-
 ```
 
 and
@@ -242,7 +238,6 @@ and
 ```bash
 
     -e WEBUI_PORT=8090 \
-
 ```
 
 ---
