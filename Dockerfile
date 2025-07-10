@@ -34,4 +34,4 @@ RUN chmod +x /root/*.sh /home/nobody/*.sh && \
 #################
 
 # run script to set uid, gid and permissions
-CMD ["/bin/bash", "/usr/local/bin/init.sh"]
+CMD ["/bin/bash", "init.sh"]
