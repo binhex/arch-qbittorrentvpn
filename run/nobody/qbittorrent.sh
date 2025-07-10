@@ -36,7 +36,7 @@ function init_qbittorrent() {
 	rm -f /config/qBittorrent/data/BT_backup/session.lock
 
 	# force unix line endings conversion in case user edited qbittorrent.conf with notepad
-	/usr/local/bin/dos2unix.sh "${qbittorrent_config}"
+	dos2unix.sh "${qbittorrent_config}"
 
 }
 
