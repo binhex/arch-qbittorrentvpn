@@ -3,11 +3,22 @@
 # exit script if return code != 0
 set -e
 
+# app name from buildx arg, used in healthcheck to identify app and monitor correct process
+APPNAME="${1}"
+shift
+
 # release tag name from buildx arg, stripped of build ver using string manipulation
 RELEASETAG="${1}"
+shift
 
 # target arch from buildx arg
-TARGETARCH="${2}"
+TARGETARCH="${1}"
+shift
+
+if [[ -z "${APPNAME}" ]]; then
+	echo "[warn] App name from build arg is empty, exiting script..."
+	exit 1
+fi
 
 if [[ -z "${RELEASETAG}" ]]; then
 	echo "[warn] Release tag name from build arg is empty, exiting script..."
@@ -19,8 +30,8 @@ if [[ -z "${TARGETARCH}" ]]; then
 	exit 1
 fi
 
-# write RELEASETAG to file to record the release tag used to build the image
-echo "IMAGE_RELEASE_TAG=${RELEASETAG}" >> '/etc/image-release'
+# write APPNAME and RELEASETAG to file to record the app name and release tag used to build the image
+echo -e "export APPNAME=${APPNAME}\nexport IMAGE_RELEASE_TAG=${RELEASETAG}" >> '/etc/image-build-info'
 
 # note do NOT download build scripts - inherited from int script with envvars common defined
 
