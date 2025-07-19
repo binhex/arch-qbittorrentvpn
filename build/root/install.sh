@@ -33,10 +33,8 @@ fi
 # write APPNAME and RELEASETAG to file to record the app name and release tag used to build the image
 echo -e "export APPNAME=${APPNAME}\nexport IMAGE_RELEASE_TAG=${RELEASETAG}" >> '/etc/image-build-info'
 
-# note do NOT download build scripts - inherited from int script with envvars common defined
-
-# get target arch from Dockerfile argument
-TARGETARCH="${2}"
+# ensure we have the latest builds scripts
+refresh.sh
 
 # pacman packages
 ####
