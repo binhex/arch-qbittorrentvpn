@@ -70,6 +70,8 @@ docker run -d \
     -e VPN_OUTPUT_PORTS=<port number(s)> \
     -e DEBUG=<true|false> \
     -e WEBUI_PORT=<port for web interfance> \
+    -e HEALTHCHECK_COMMAND=<command> \
+    -e HEALTHCHECK_ACTION=<action> \
     -e UMASK=<umask for created files> \
     -e PUID=<uid for user> \
     -e PGID=<gid for user> \
