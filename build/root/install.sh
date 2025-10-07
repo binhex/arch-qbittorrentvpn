@@ -54,15 +54,6 @@ if [[ -n "${pacman_packages}" ]]; then
 	pacman -S --needed $pacman_packages --noconfirm
 fi
 
-# aur packages
-####
-
-# define aur packages
-aur_packages=""
-
-# call aur install script (arch user repo) - note true required due to autodl-irssi error during install
-source aur.sh
-
 # custom
 ####
 
