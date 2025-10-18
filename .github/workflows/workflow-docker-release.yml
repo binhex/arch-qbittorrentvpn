@@ -18,8 +18,6 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-      GITLAB_USERNAME: ${{ secrets.GITLAB_USERNAME }}
       IMMORTALITY_PAT: ${{ secrets.IMMORTALITY_PAT }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
