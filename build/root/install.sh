@@ -31,7 +31,7 @@ if [[ -z "${TARGETARCH}" ]]; then
 fi
 
 # write APPNAME and RELEASETAG to file to record the app name and release tag used to build the image
-echo -e "export APPNAME=${APPNAME}\nexport IMAGE_RELEASE_TAG=${RELEASETAG}\nexport TARGETARCH=${TARGETARCH}\n" >> '/etc/image-build-info'
+echo -e "export APPNAME=${APPNAME}\nexport IMAGE_RELEASE_TAG=${RELEASETAG}\n" >> '/etc/image-build-info'
 
 # ensure we have the latest builds scripts
 refresh.sh
