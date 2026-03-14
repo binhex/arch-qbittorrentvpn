@@ -9,7 +9,7 @@ on:
 
 jobs:
   call-reusable-workflow:
-    uses: binhex/templates/workflows/.github/workflows/workflow-docker-manual.yml@main
+    uses: binhex/templates/.github/workflows/workflow-docker-manual.yml@main
     with:
       tags: ${{ github.event.inputs.tags }}
       platforms: linux/amd64,linux/arm64
