@@ -7,7 +7,7 @@ on:
 
 jobs:
   call-reusable-workflow:
-    uses: binhex/workflow-templates/.github/workflows/workflow-docker-release.yml@main
+    uses: binhex/templates/.github/workflows/workflow-docker-release.yml@main
     with:
       tags: ${{ github.event.inputs.tags }}
       platforms: linux/amd64,linux/arm64
