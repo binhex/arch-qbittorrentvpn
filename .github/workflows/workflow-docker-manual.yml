@@ -1,1 +1,25 @@
-/data/templates/projects/common/.github/workflows/workflow-docker-manual.yml
+name: workflow-docker-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Enter tag name for test/dev image'
+        default: 'test'
+
+jobs:
+  call-reusable-workflow:
+    uses: binhex/templates/.github/workflows/workflow-docker-manual.yml@main
+    with:
+      tags: ${{ github.event.inputs.tags }}
+    secrets:
+      CR_PAT: ${{ secrets.CR_PAT }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      IMMORTALITY_PAT: ${{ secrets.IMMORTALITY_PAT }}
+      QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      TDB_PAT: ${{ secrets.TDB_PAT }}
