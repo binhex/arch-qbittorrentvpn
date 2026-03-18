@@ -9,7 +9,7 @@ on:
 
 jobs:
   call-reusable-workflow:
-    uses: binhex/templates/.github/workflows/workflow-docker-manual.yml@main
+    uses: binhex/templates/workflows/workflow-docker-manual.yml@main
     with:
       tags: ${{ github.event.inputs.tags }}
     secrets:
