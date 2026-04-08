@@ -6,12 +6,22 @@ on:
       tags:
         description: 'Enter tag name for test/dev image'
         default: 'test'
+        required: true
 
 jobs:
   call-reusable-workflow:
+    strategy:
+      matrix:
+        include:
+          - branch: master
+            tag_suffix: ""
+          - branch: libtorrentv1
+            tag_suffix: ""
     uses: binhex/templates/.github/workflows/workflow-docker-manual.yml@main
     with:
       tags: ${{ github.event.inputs.tags }}
+      platforms: linux/amd64,linux/arm64
+      checkout_ref: ${{ matrix.branch }}
     secrets:
       CR_PAT: ${{ secrets.CR_PAT }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
