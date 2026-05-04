@@ -14,10 +14,10 @@ jobs:
             tag_suffix: ""
           - branch: libtorrentv1
             tag_suffix: ""
-    uses: binhex/templates/.github/workflows/workflow-docker-release.yml@main
+    uses: binhex/templates/.github/workflows/workflow-docker-release.yml@libtorrentv1
     with:
       tags: ${{ github.event.inputs.tags }}
-      platforms: linux/amd64,linux/arm64
+      platforms: linux/amd64
       checkout_ref: ${{ matrix.branch }}
     secrets:
       CR_PAT: ${{ secrets.CR_PAT }}
