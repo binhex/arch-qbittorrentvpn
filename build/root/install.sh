@@ -32,7 +32,7 @@ fi
 aur_packages="libtorrent-rasterbar-1_2-git"
 
 # call aur install script (arch user repo)
-source aur.sh
+aur.sh --aur-package "${aur_packages}"
 
 # ignore aor package 'libtorrent-rasterbar' to prevent upgrade to libtorrent v2 as libtorrent
 # v2 causes numerous issues, including crashing on unraid due to kernel bug
