@@ -35,6 +35,9 @@ function init_qbittorrent() {
 	echo "[info] Removing session lock file (if it exists)..."
 	rm -f /config/qBittorrent/data/BT_backup/session.lock
 
+	echo "[info] Removing qbittorrent lock file (if it exists)..."
+	rm -f '/config/qBittorrent/config/lockfile'
+
 	# force unix line endings conversion in case user edited qbittorrent.conf with notepad
 	dos2unix.sh "${qbittorrent_config}"
 
