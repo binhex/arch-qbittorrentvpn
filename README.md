@@ -89,8 +89,9 @@ correct values.
 `http://<host ip>:8080/`
 
 Username:- `admin`
+Password:- `adminadmin` (default permanent password set on first start)
 
-Password:- randomly generated, password shown in `/config/supervisord.log`
+**Note:** Starting with qBittorrent 4.6.1 the application no longer ships a static default password and instead prints a one-time temporary password. This image automatically writes a permanent password hash for `adminadmin` when none exists, so login is reliable across restarts (fixes https://github.com/binhex/arch-qbittorrentvpn/issues/341). **Change the password immediately after first login** via the WebUI (Tools → Options → Web UI).
 
 ## Access Privoxy
 
@@ -198,6 +199,7 @@ there.
 
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to
 use either of these NS providers.
+
 The list of default NS providers in the above example(s) is as follows:-
 
 84.200.x.x = DNS Watch
@@ -228,25 +230,3 @@ for the user you want to run the container as:-
 Due to issues with CSRF and port mapping, should you require to alter the port
 for the webui you need to change both sides of the -p 8080 switch AND set the
 WEBUI_PORT variable to the new port.
-
-For example, to set the port to 8090 you need to set:-
-
-```bash
-
-    -p 8090:8090 \
-```
-
-and
-
-```bash
-
-    -e WEBUI_PORT=8090 \
-```
-
----
-
-If you appreciate my work, then please consider buying me a beer  :D
-
-[![PayPal donation](https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MM5E27UX6AUU4)
-
-[Documentation](https://github.com/binhex/documentation) | [Support forum](https://forums.unraid.net/topic/75539-support-binhex-qbittorrentvpn/)
