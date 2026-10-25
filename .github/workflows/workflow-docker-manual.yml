@@ -13,14 +13,16 @@ jobs:
     strategy:
       matrix:
         include:
-          - branch: master
+          - branch: main
             tag_suffix: ""
+            platforms: linux/amd64,linux/arm64
           - branch: libtorrentv1
             tag_suffix: ""
-    uses: binhex/templates/.github/workflows/workflow-docker-manual.yml@libtorrentv1
+            platforms: linux/amd64
+    uses: binhex/templates/.github/workflows/workflow-docker-manual.yml@main
     with:
       tags: ${{ github.event.inputs.tags }}
-      platforms: linux/amd64
+      platforms: linux/amd64,linux/arm64
       checkout_ref: ${{ matrix.branch }}
     secrets:
       CR_PAT: ${{ secrets.CR_PAT }}
