@@ -14,6 +14,24 @@ function edit_qbittorrent_config() {
 	# set locale to prevent 4.1.4 gui render issues if no locale set
 	grep -q 'General\\Locale' "${qbittorrent_config}" || sed -i '/\[Preferences\]/a General\\Locale=en' "${qbittorrent_config}"
 
+	# Fix for temporary password login failures (issue #341 and related).
+	# qBittorrent >= 4.6.1 generates a one-time temporary password when no permanent
+	# WebUI\\Password_PBKDF2 is present. That password is printed to stdout but becomes
+	# invalid after any process restart (watchdog IP/port changes, container restart, etc.).
+	# Ensure a permanent password hash exists so login is deterministic.
+	# Default password is "adminadmin". Users should change it after first login.
+	if ! grep -q '^WebUI\\Password_PBKDF2=' "${qbittorrent_config}"; then
+		echo "[info] No permanent WebUI password found – setting default password 'adminadmin' (change it after login)"
+		# Known PBKDF2 hash for the password "adminadmin"
+		# @ByteArray(<salt>:<hash>) format used by qBittorrent
+		if grep -q '^\[Preferences\]' "${qbittorrent_config}"; then
+			sed -i '/\[Preferences\]/a WebUI\\Password_PBKDF2="@ByteArray(ARQ77eY1NUZaQsuDHbIMCA==:0WMRkYTUWVT9wVvdDtHAjU9b3b7uB8NR1Gur2hmQCvCDpm39Q+PsJRJPaCU51dEiz+dTzh8qbPsL8WkFljQYFQ==)"' "${qbittorrent_config}"
+		else
+			# Fallback if Preferences section is missing for any reason
+			echo 'WebUI\\Password_PBKDF2="@ByteArray(ARQ77eY1NUZaQsuDHbIMCA==:0WMRkYTUWVT9wVvdDtHAjU9b3b7uB8NR1Gur2hmQCvCDpm39Q+PsJRJPaCU51dEiz+dTzh8qbPsL8WkFljQYFQ==)"' >> "${qbittorrent_config}"
+		fi
+	fi
+
 }
 
 function init_qbittorrent() {
