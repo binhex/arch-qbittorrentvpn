@@ -208,6 +208,18 @@ The list of default NS providers in the above example(s) is as follows:-
 
 ---
 
+### Clean shutdown
+
+When the container is stopped qBittorrent has to write the resume data of every
+torrent before it exits. With a large number of torrents this can take several
+minutes. Docker only waits 10 seconds by default before it kills the container,
+so give it more time: `--stop-timeout=600` on `docker run`, `stop_grace_period:
+10m` in docker compose, or `--stop-timeout=600` in the Extra Parameters field
+on Unraid. The container itself waits up to 10 minutes for qBittorrent to exit
+before the VPN tunnel is torn down.
+
+---
+
 ### IMPORTANT
 
 Please note `VPN_INPUT_PORTS` is **NOT** to define the incoming port for the

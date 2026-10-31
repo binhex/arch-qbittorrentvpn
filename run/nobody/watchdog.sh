@@ -13,6 +13,46 @@ sleep_period_incoming_port_secs=1800
 # sleep period counter - used to limit number of hits to external website to check incoming port
 sleep_period_counter_secs=0
 
+# maximum time in seconds to wait for qbittorrent-nox to save resume data and
+# exit when the container is stopped. this must be lower than 'stopwaitsecs' for
+# watchdog-script in /etc/supervisor/conf.d/qbittorrent.conf, otherwise supervisord
+# kills this script before qbittorrent has finished.
+qbittorrent_shutdown_timeout_secs=570
+
+function shutdown_handler() {
+
+	# this script runs under dumb-init, which forwards SIGTERM to the whole process
+	# group, so qbittorrent-nox has received the same SIGTERM and has already begun
+	# its clean exit (identical to 'File > Exit' in the web ui). do NOT signal it
+	# again: qbittorrent resets its SIGTERM handler to the default action as soon as
+	# it has caught the first one, so a second SIGTERM terminates it on the spot,
+	# before resume data is written. all this handler has to do is keep this script
+	# alive until qbittorrent is gone, because as soon as this script exits dumb-init
+	# sends another SIGTERM to the process group and supervisord moves on to stop
+	# the vpn and the container.
+	echo "[info] Shutdown requested, waiting up to ${qbittorrent_shutdown_timeout_secs} seconds for qBittorrent to save resume data and exit..."
+
+	for ((i = 0; i < qbittorrent_shutdown_timeout_secs; i++)); do
+
+		if ! pgrep -x "qbittorrent-nox" > /dev/null; then
+
+			echo "[info] qBittorrent exited cleanly after ${i} seconds"
+			exit 0
+
+		fi
+
+		sleep 1
+
+	done
+
+	echo "[warn] qBittorrent still running after ${qbittorrent_shutdown_timeout_secs} seconds, giving up"
+	exit 1
+
+}
+
+# run shutdown handler when supervisord stops this script (container stop)
+trap shutdown_handler SIGTERM SIGINT
+
 # while loop to check ip and port
 while true; do
 
