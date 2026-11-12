@@ -44,6 +44,8 @@ docker run -d \
     -e VPN_OUTPUT_PORTS=<port number(s)> \
     -e DEBUG=<true|false> \
     -e WEBUI_PORT=<port for web interfance> \
+    -e ENABLE_STARTUP_SCRIPTS=<yes|no> \
+    -e STARTUP_SCRIPTS_MODE=<wait|parallel> \
     -e UMASK=<umask for created files> \
     -e PUID=<uid for user> \
     -e PGID=<gid for user> \
@@ -88,6 +90,8 @@ docker run -d \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
     -e WEBUI_PORT=8080 \
+    -e ENABLE_STARTUP_SCRIPTS=no \
+    -e STARTUP_SCRIPTS_MODE=wait \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
@@ -135,6 +139,8 @@ docker run -d \
     -e VPN_OUTPUT_PORTS=5678 \
     -e DEBUG=false \
     -e WEBUI_PORT=8080 \
+    -e ENABLE_STARTUP_SCRIPTS=no \
+    -e STARTUP_SCRIPTS_MODE=wait \
     -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
@@ -174,6 +180,14 @@ PIA users - The WireGuard configuration file will be auto generated and will be 
 Other users - Please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
 
 **Notes**<br/>
+`ENABLE_STARTUP_SCRIPTS` when set to `yes` (default `no`) will allow a user to
+install additional packages from the official Arch Repository or the Arch User
+Repository (AUR) via scripts located in the folder `/config/scripts/`.
+
+`STARTUP_SCRIPTS_MODE` controls how those scripts are executed, set to `wait`
+(default) to run each script in turn and wait for it to complete before the next
+script runs, or `parallel` to run all scripts at the same time.
+
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
