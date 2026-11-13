@@ -9,7 +9,8 @@ function edit_qbittorrent_config() {
 	sed -i -e "s~^Session\\\\InterfaceName\=.*~Session\\\\InterfaceName\=${VPN_DEVICE_TYPE}~g" "${qbittorrent_config}"
 
 	# forcibly set allow anonymous access from localhost to api (used to change incoming port)
-	sed -i -e 's~^WebUI\\LocalHostAuth=.*~WebUI\\LocalHostAuth=false~g' "${qbittorrent_config}"
+	# note qbittorrent 5.3+ moved this from '[Preferences] WebUI\LocalHostAuth' to '[WebUI] LocalHostAuth'
+	sed -i -E 's~^((WebUI\\)?LocalHostAuth)=.*~\1=false~g' "${qbittorrent_config}"
 
 	# set locale to prevent 4.1.4 gui render issues if no locale set
 	grep -q 'General\\Locale' "${qbittorrent_config}" || sed -i '/\[Preferences\]/a General\\Locale=en' "${qbittorrent_config}"
@@ -50,7 +51,8 @@ function configure_incoming_port(){
 	if [[ "${VPN_PROV}" == "pia" ||  "${VPN_PROV}" == "protonvpn" ]] && [[ -n "${VPN_INCOMING_PORT}" ]]; then
 
 		# identify protocol, used by curl to connect to api
-		if grep -q 'WebUI\\HTTPS\\Enabled=true' "${qbittorrent_config}"; then
+		# note qbittorrent 5.3+ moved this from '[Preferences] WebUI\HTTPS\Enabled' to '[WebUI] HTTPS\Enabled'
+		if grep -qE '^(WebUI\\)?HTTPS\\Enabled=true' "${qbittorrent_config}"; then
 			web_protocol="https"
 		else
 			web_protocol="http"
